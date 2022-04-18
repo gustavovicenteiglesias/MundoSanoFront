@@ -1,0 +1,7 @@
+{
+  "name": "Mundo_Sano",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
