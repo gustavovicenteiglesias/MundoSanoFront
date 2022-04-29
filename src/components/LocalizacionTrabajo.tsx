@@ -1,21 +1,47 @@
-import { IonItem, IonItemGroup, IonLabel, IonSelect, IonSelectOption } from "@ionic/react";
-import { useState } from "react";
-import  "../pages/Home.css"
-
+import { IonButton, IonItem, IonItemGroup, IonLabel, IonSelect, IonSelectOption } from "@ionic/react";
+import { useEffect, useState } from "react";
+import "../pages/Home.css"
+import Consulta from "../data/data";
+interface Pais {
+    ubicacion: {
+        pais:
+        {
+            nombre: string,
+            parajes: string[]
+        }[]
+    }
+}
 const LocalizacionTrabajo: React.FC = () => {
-    const [gender, setGender] = useState<string>();
+    const [pais, setPais] = useState<string>();
+    const [response, setResponse] = useState<Pais>();
+
+    useEffect(() => {
+        setResponse(Consulta.data)
+    }, [])
+    const continuar=()=>{
+
+        console.log("continuar")
+    }
     return (
+        <>
         <IonItemGroup>
-           
             <IonItem>
-                <IonLabel>Gender</IonLabel>
-                <IonSelect value={gender} placeholder="Select One" onIonChange={e => setGender(e.detail.value)}>
-                    <IonSelectOption value="female">Female</IonSelectOption>
-                    <IonSelectOption value="male">Male</IonSelectOption>
+                <IonLabel>PAÍS</IonLabel>
+                <IonSelect value={pais} placeholder="opcion" onIonChange={e => setPais(e.detail.value)}>
+                    {response?.ubicacion.pais.map((data,i)=>{
+                        return(
+                            <IonSelectOption key={i} value={data.nombre}>{data.nombre}</IonSelectOption>
+                        )
+                    })
+
+                    }
+                   
                 </IonSelect>
             </IonItem>
             
         </IonItemGroup>
+        <IonButton expand='block' routerLink="/personas">Continuar</IonButton>
+        </>
     )
 
 }

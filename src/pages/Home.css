@@ -76,6 +76,12 @@ ion-row :last-child  .content-div{
 .content-div-1 img{
     width: 90%;
 }
+
+.line-separator{
+    height: 2px;
+    width: 80%;
+    background-color: #aaaaaa;
+}
 @media (max-width:767px) {
     ion-row :first-child  .content-div{
         border-bottom: 10px solid var(--borde-gris);

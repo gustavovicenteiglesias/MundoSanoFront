@@ -29,11 +29,11 @@ const Home: React.FC = () => {
           <IonCol sizeMd='8' sizeSm='12' sizeXs='12'>
             <div className='content-div'>
               <h3>Seleccione localización de trabajo</h3>
+              <div className='line-separator'></div>
               <div className='item-center'>
               <LocalizacionTrabajo />
-              <LocalizacionTrabajo />
-              <LocalizacionTrabajo />
-              <IonButton expand='block'>Continuar</IonButton>
+              
+              
               </div>
               
             </div>
