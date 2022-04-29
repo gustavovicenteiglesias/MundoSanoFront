@@ -7,11 +7,11 @@ const Home: React.FC = () => {
   return (
     
       
-      <IonContent>
+      <IonContent className='content-border'>
     <IonGrid>
       <IonRow>
-        <IonCol size='4'>ion-col</IonCol>
-        <IonCol size='8'>ion-col</IonCol>
+        <IonCol sizeMd='4' sizeSm='12' sizeXs='12'><div className='content-div'>ion-col</div> </IonCol>
+        <IonCol sizeMd='8' sizeSm='12' sizeXs='12'><div className='content-div'>ion-col</div></IonCol>
        
       </IonRow>
 
