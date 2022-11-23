@@ -1,15 +1,18 @@
-import { IonButton,  IonCol, IonContent, IonGrid,  IonRow } from '@ionic/react';
+import { IonButton,  IonCol, IonContent, IonGrid,  IonPage,  IonRow } from '@ionic/react';
 
 import LocalizacionTrabajo from '../components/LocalizacionTrabajo';
 
 import './Home.css';
+interface propiedades{
+  paises:string[]
+}
 
-const Home: React.FC = () => {
-
+const Home: React.FC<any>= ({paises}) => {
+console.log("paises"+JSON.stringify(paises) )
   
   return (
 
-
+    <IonPage>
     <IonContent className='content-border'>
       <IonGrid>
         <IonRow>
@@ -31,7 +34,7 @@ const Home: React.FC = () => {
               <h3>Seleccione localización de trabajo</h3>
               <div className='line-separator'></div>
               <div className='item-center'>
-              <LocalizacionTrabajo />
+              <LocalizacionTrabajo paises={paises}/>
               
               
               </div>
@@ -44,7 +47,7 @@ const Home: React.FC = () => {
 
       </IonGrid>
     </IonContent>
-
+    </IonPage>
 
   );
 };

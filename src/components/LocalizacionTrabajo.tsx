@@ -7,28 +7,23 @@ interface Pais {
         pais:
         {
             nombre: string,
-            parajes: string[]
+            parajes?: string[]
         }[]
     }
 }
-const LocalizacionTrabajo: React.FC = () => {
+const LocalizacionTrabajo: React.FC<any> = ({paises}) => {
     const [pais, setPais] = useState<string>();
-    const [response, setResponse] = useState<Pais>();
-
-    useEffect(() => {
-        setResponse(Consulta.data)
-    }, [])
-    const continuar=()=>{
-
-        console.log("continuar")
-    }
+   
+    console.log(`lovalizacion ${JSON.stringify(paises)}`)
+    console.log(pais)
+   
     return (
         <>
         <IonItemGroup>
             <IonItem>
                 <IonLabel>PAÍS</IonLabel>
                 <IonSelect value={pais} placeholder="opcion" onIonChange={e => setPais(e.detail.value)}>
-                    {response?.ubicacion.pais.map((data,i)=>{
+                    {paises?.map((data:any,i:any)=>{
                         return(
                             <IonSelectOption key={i} value={data.nombre}>{data.nombre}</IonSelectOption>
                         )
