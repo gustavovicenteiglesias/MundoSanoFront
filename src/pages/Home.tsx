@@ -1,43 +1,64 @@
 import { IonButton,  IonCol, IonContent, IonGrid,  IonPage,  IonRow } from '@ionic/react';
+import { useEffect, useState } from 'react';
+import { SQLiteDBConnection, useSQLite } from 'react-sqlite-hook';
 
 import LocalizacionTrabajo from '../components/LocalizacionTrabajo';
 
-import './Home.css';
-interface propiedades{
-  paises:string[]
-}
+//import './Home.css';
 
-const Home: React.FC<any>= ({paises}) => {
-console.log("paises"+JSON.stringify(paises) )
+
+const Home: React.FC<any>= () => {
+
+
+let sqlite = useSQLite()
+
+  const [paises,setPaises]=useState<any>([]);
   
+useEffect(()=>{
+  const testDatabaseCopyFromAssets = async (): Promise<any> => {
+    try {
+      let existe:any= await sqlite.isDatabase("triplefrontera")
+      if(!existe.result)sqlite.copyFromAssets();
+    let db: SQLiteDBConnection = await sqlite.createConnection("triplefrontera")
+    await db.open();
+    let res: any = await db.query("SELECT * FROM paises");
+    let personas:any=await db.query("SELECT p.nombre,p.apellido FROM ubicaciones u INNER JOIN personas p ON p.id_persona=u.id_persona WHERE u.id_pais=12 AND u.id_area=3 AND u.id_paraje=17 ")
+    console.log(`@@@ res.values.length ${res.values.length}`)
+    console.log(`@@@ res ${res}`)
+    console.log(`@@@ res.values ${JSON.stringify(res.values) }`)
+    console.log(`@@@ personas.values ${JSON.stringify(personas.values) }`)
+    setPaises( res.values);
+    res.values.map((data:any)=>{
+      
+      return(
+        console.log(data.nombre)
+      )
+      
+    })
+    
+   // setPaises(JSON.parse(res.values) )
+   db.close()
+    await sqlite.closeConnection("triplefrontera")
+    return true;
+  }
+ catch (error:any) {
+  return false;
+}
+} 
+  testDatabaseCopyFromAssets()
+}, [])
   return (
 
     <IonPage>
     <IonContent className='content-border'>
       <IonGrid>
         <IonRow>
-          <IonCol sizeMd='4' sizeSm='12' sizeXs='12' className='ion-justify-content-between'>
-           <div className='content-div-1'>
-           
-            <img src="https://www.mundosano.org/wp-content/themes/mundosano/img/logo.svg" alt="mundo sano"  />
-           
-            
-              <img src="https://unsada.edu.ar/images/headers/unsada_logo_400.jpg" alt="unsada"  />
-            
-           
-            <img src="https://www.adesar.org.ar/wp-content/uploads/2021/09/logo_adesar-alta-01-01-740x167-1.png" alt="AdeSar"  />
-           
-            </div>
-             </IonCol>
-          <IonCol sizeMd='8' sizeSm='12' sizeXs='12'>
+         
+          <IonCol >
             <div className='content-div'>
               <h3>Seleccione localización de trabajo</h3>
-              <div className='line-separator'></div>
-              <div className='item-center'>
+              
               <LocalizacionTrabajo paises={paises}/>
-              
-              
-              </div>
               
             </div>
           </IonCol>

@@ -35,7 +35,7 @@ const LocalizacionTrabajo: React.FC<any> = ({paises}) => {
             </IonItem>
             
         </IonItemGroup>
-        <IonButton expand='block' routerLink="/personas">Continuar</IonButton>
+        <IonButton expand='block' routerLink="/personas" color="secondary">Continuar</IonButton>
         </>
     )
 
