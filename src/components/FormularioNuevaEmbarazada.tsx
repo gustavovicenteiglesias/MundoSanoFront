@@ -12,9 +12,7 @@ import { ErrorMessage } from '@hookform/error-message';
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css";
 import "../pages/Home.css"
-//interface Props {
-// OnsutmitcallBack: (n: any) => void
-//}
+
 interface persona {
     id_persona?: number,
     apellido?: string,
@@ -95,52 +93,7 @@ const FormularioNuevaEmbarazada: React.FC = () => {
         setPaciente((prevProps) => ({ ...prevProps, [name]: value }));
     }
 
-    /*const onSubmit = async (e: any) => {
-        e.preventDefault()
-        setLoading(true)
-        console.log(paciente)
-        if (paciente !== undefined) {
-            let resp = await insertDataSubmit(paciente)
-            if (resp) {
-                setLoading(false)
-                showAlert({
-                    cssClass: 'my-css',
-                    header: 'Exito',
-                    message: 'se registro de manera exitosa!',
-                    buttons: [{
-                        text: 'Ok', handler: (d) => {
-                            console.log('ok pressed');
-                            history.push({ pathname: "/nuevaembarazadaantecedentes", state: paciente })
-                            //OnsutmitcallBack(paciente) ;
-                        }
-                    }],
-                    onDidDismiss: (e) => {
-                        history.push({ pathname: "/nuevaembarazadaantecedentes", state: paciente })
-                        //OnsutmitcallBack(paciente);
-                    },
-                });
-            } else {
-                setLoading(false)
-                showAlert({
-                    cssClass: 'my-css',
-                    header: 'Error',
-                    message: 'no se registro de manera exitosa!',
-                    buttons: [{
-                        text: 'Ok', handler: (d) => {
-
-                        }
-                    }],
-                    onDidDismiss: (e) => {
-
-                    },
-                });
-            }
-        }
-
-
-    }
-*/
-
+    
     const onSubmit = (data: any) => {
         alert(JSON.stringify(data, null, 2));
     };
@@ -150,12 +103,7 @@ const FormularioNuevaEmbarazada: React.FC = () => {
             let db: SQLiteDBConnection = await sqlite.createConnection("triplefrontera")
             await db.open();
             let res: any = await db.query("SELECT * FROM personas ORDER BY id_persona DESC LIMIT 1")
-            //let resp: any = await db.run(`INSERT INTO personas (id_persona,apellido,nombre,documento,fecha_nacimiento,id_origen,nacionalidad,sexo,madre,alta,nacido_vivo) VALUES (${res.values[0].id_persona + 1},"${paciente?.apellido}","${paciente?.nombre}","${paciente?.documento}","${paciente?.fecha_nacimiento}",${paciente?.id_origen},${paciente?.nacionalidad},"${paciente?.sexo}",${paciente?.madre},${paciente?.alta},${paciente?.nacido_vivo})`)
-            //let respUbicacion= await db.run(`INSERT INTO ubicaciones (id_ubicacion,id_persona,id_area,id_paraje,num_vivienda,fecha,georeferencia,id_pais)VALUES(${res.values[0].id_persona + 1},${res.values[0].id_persona + 1},${paciente?.area_residencia},${paciente?.paraje_residencia},${paciente?.num_vivienda},date('now'),"${paciente?.latitud},${paciente?.longitud}",${paciente?.pais_residencia})`)
-            //let resControles= await db.run(`INSERT INTO controles (id_persona,id_control,fecha,control_numero,id_estado,georeferencia)VALUES (${res.values[0].id_persona + 1},(SELECT id_control + 1 FROM controles ORDER BY id_control DESC LImit 1),DATE("now") ,1,1,"${paciente?.latitud},${paciente?.longitud}")`)
-
-
-
+           
             setPaciente((prevProps) => ({ ...prevProps, id_persona: res.values[0].id_persona + 1 }))
             setPaciente((prevProps) => ({ ...prevProps, formLLeno: true }))
             db.close()
@@ -208,7 +156,7 @@ const FormularioNuevaEmbarazada: React.FC = () => {
         }
         testDatabaseCopyFromAssets()
     }, [paciente])
-
+    console.log(paciente)
 
     return (
 
@@ -259,7 +207,7 @@ const FormularioNuevaEmbarazada: React.FC = () => {
                                 required: 'Este campo es requerido',
                                 pattern: {
                                     value: /^[\d]{1,3}\.?[\d]{3,3}\.?[\d]{3,3}$/,
-                                    message: 'Nombre incorrecto'
+                                    message: 'DNI incorrecto'
                                 },
 
                             })}
@@ -298,45 +246,7 @@ const FormularioNuevaEmbarazada: React.FC = () => {
                         name="startDate"
                         as={<div style={{ color: 'red' }} />}
                     />
-                    {/*
                     
-                    {/*<IonInput name="nombre" required onIonChange={(e) => handleInputChange(e)}></IonInput>*/}
-
-                    { /* <IonItem>
-                    <IonLabel position="floating">Apellido</IonLabel>
-                    <IonInput name="apellido" required onIonChange={(e) => handleInputChange(e)}></IonInput>
-                </IonItem>
-                <IonItem>
-                    <IonLabel position="floating">Documento</IonLabel>
-                    <IonInput name="documento" required onIonChange={(e) => handleInputChange(e)}></IonInput>
-
-                </IonItem>
-                <IonItem>
-                    <IonLabel position="stacked">Fecha de Nacimiento</IonLabel>
-                    <IonInput onClick={() => setDataPicker(true)} name="fecha_nacimiento">{fecha1}</IonInput>
-
-                    {datapicker && <IonDatetime presentation="date" onIonChange={(e) => fechaNacimiento(e)} value={fecha}></IonDatetime>}
-                </IonItem>
-                <IonItem>
-                    <IonLabel position="floating">Origen</IonLabel>
-                    <IonSelect onIonChange={e => handleInputChange(e)} name="id_origen" >
-                        {origen.map((data: any, i: any) => {
-                            return <IonSelectOption value={data.id_origen} key={i}>{data.nombre}</IonSelectOption>
-                        })}
-
-                    </IonSelect>
-                </IonItem>
-                <IonItem>
-                    <IonLabel position="floating">Nacionalidad</IonLabel>
-                    <IonSelect onIonChange={e => handleInputChange(e)} name="nacionalidad">
-                        {paises.map((data: any, i: any) => {
-                            return <IonSelectOption value={data.id_pais} key={i}>{data.nombre}</IonSelectOption>
-                        })}
-
-                    </IonSelect>
-
-                </IonItem>*/}
-
                 </IonList>
                 <IonList>
                     {/* === SELECTS UBICACION PAIS === */}
