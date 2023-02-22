@@ -23,7 +23,7 @@ const FormularioNuevaPuerpera: React.FC = () => {
     let sqlite = useSQLite()
     const fechaNacimiento = (e: any) => {
         const dia = moment(e.detail.value).format("DD-MM-YYYY")
-        console.log(dia)
+        
         setDataPicker(false)
         setFecha(e.detail.value)
         setFecha1(dia)
@@ -35,12 +35,12 @@ const FormularioNuevaPuerpera: React.FC = () => {
                                 setLatitud(resp.coords.latitude)
                                 setLongitud(resp.coords.longitude)
                             })
-        console.log('Current position:', coordinates);
+        
       };
 
       const onSubmit=(e:any)=>{
         e.preventDefault()
-        console.log(`Formulario`)
+        
       }
 
     useEffect(()=>{
@@ -52,7 +52,7 @@ const FormularioNuevaPuerpera: React.FC = () => {
         const testDatabaseCopyFromAssets = async (): Promise<any> => {
             try {
                 let respConection = await sqlite.isConnection("triplefrontera")
-                console.log("conection " + JSON.stringify(respConection))
+                
                 if (respConection.result) {
                     await sqlite.closeConnection("triplefrontera")
 
@@ -67,9 +67,9 @@ const FormularioNuevaPuerpera: React.FC = () => {
                 setArea(resArea.values)
                 let resParaje: any = await db.query(`SELECT * FROM parajes WHERE id_area=${areaResidencia}`)
                 setParaje(resParaje.values)
-                console.log(`@@@ res.control ${JSON.stringify(res.values)}`)
-                console.log(`@@@ res.area ${JSON.stringify(resArea.values)}`)
-                console.log(`@@@ res.Paraje ${JSON.stringify(resParaje.values)}`)
+                
+                
+                
                 db.close()
                 await sqlite.closeConnection("triplefrontera")
                 return true;
@@ -80,7 +80,7 @@ const FormularioNuevaPuerpera: React.FC = () => {
         }
         testDatabaseCopyFromAssets()
     }, [paisRecidencia,areaResidencia])
-    console.log(areaResidencia)
+    
     return (
         <IonContent>
             <form onSubmit={(e)=>onSubmit(e)}>

@@ -15,7 +15,7 @@ const ControlesPacientes:React.FC<any>=({controles})=>{
                 break;
         }
     }
-    console.log("ControlPaciente@@@@@ "+ JSON.stringify(controles))
+    
     return(
         <>
         {controles.map((data: any, i: any) => {

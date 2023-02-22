@@ -71,7 +71,7 @@ const FormularioNuevaEmbarazada: React.FC = () => {
 
     const fechaNacimiento = (e: any) => {
         const dia = moment(e.detail.value).format("DD-MM-YYYY")
-        console.log(dia)
+        
         setDataPicker(false)
         setPaciente((prevProps) => ({ ...prevProps, fecha_nacimiento: moment(e.detail.value).format("YYYY-MM-DD") }))
         setFecha1(dia)
@@ -85,7 +85,7 @@ const FormularioNuevaEmbarazada: React.FC = () => {
                 setPaciente((prevProps) => ({ ...prevProps, latitud: resp.coords.latitude }))
                 setPaciente((prevProps) => ({ ...prevProps, longitud: resp.coords.longitude }))
             })
-        console.log('Current position:', coordinates);
+        
     };
 
     const handleInputChange = (e: any) => {
@@ -130,7 +130,7 @@ const FormularioNuevaEmbarazada: React.FC = () => {
         const testDatabaseCopyFromAssets = async (): Promise<any> => {
             try {
                 let respConection = await sqlite.isConnection("triplefrontera")
-                console.log("conection " + JSON.stringify(respConection))
+                
                 if (respConection.result) {
                     await sqlite.closeConnection("triplefrontera")
 
@@ -156,7 +156,7 @@ const FormularioNuevaEmbarazada: React.FC = () => {
         }
         testDatabaseCopyFromAssets()
     }, [paciente])
-    console.log(paciente)
+    
 
     return (
 
@@ -170,7 +170,7 @@ const FormularioNuevaEmbarazada: React.FC = () => {
                             {...register('nombre', {
                                 required: 'Este campo es requerido',
                                 pattern: {
-                                    value: /^([A-ZÁÉÍÓÚ]{1}[a-zñáéíóú]+[\s]*)+$/,
+                                    value: /^([A-ZÁÉÍÓÚ][a-zñáéíóú]+[\s]*)+$/,
                                     message: 'Nombre incorrecto'
                                 },
 
@@ -188,7 +188,7 @@ const FormularioNuevaEmbarazada: React.FC = () => {
                             {...register('apellido', {
                                 required: 'Este campo es requerido',
                                 pattern: {
-                                    value: /^([A-ZÁÉÍÓÚ]{1}[a-zñáéíóú]+[\s]*)+$/,
+                                    value: /^([A-ZÁÉÍÓÚ][a-zñáéíóú]+[\s]*)+$/,
                                     message: 'Nombre incorrecto'
                                 },
 
@@ -206,7 +206,7 @@ const FormularioNuevaEmbarazada: React.FC = () => {
                             {...register('documento', {
                                 required: 'Este campo es requerido',
                                 pattern: {
-                                    value: /^[\d]{1,3}\.?[\d]{3,3}\.?[\d]{3,3}$/,
+                                    value: /^[\d]{7,8}$/,
                                     message: 'DNI incorrecto'
                                 },
 

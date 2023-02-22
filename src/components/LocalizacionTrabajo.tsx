@@ -14,8 +14,8 @@ interface Pais {
 const LocalizacionTrabajo: React.FC<any> = ({paises}) => {
     const [pais, setPais] = useState<string>();
    
-    console.log(`lovalizacion ${JSON.stringify(paises)}`)
-    console.log(pais)
+    
+    
    
     return (
         <>

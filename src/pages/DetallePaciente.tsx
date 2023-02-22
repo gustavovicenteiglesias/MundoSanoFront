@@ -56,21 +56,17 @@ const DetallePaciente: React.FC = () => {
     const [paciente, setPaciente] = useState<any>(location.state);
     const [controles, setControles] = useState<controls>([])
 
-
-
-
-
     let fecha = moment("es")
     let hoy = moment();
     let sqlite = useSQLite()
-
-
+    const history=useHistory()
+   
     useEffect(() => {
 
         const testDatabaseCopyFromAssets = async (): Promise<any> => {
             try {
                 let respConection = await sqlite.isConnection("triplefrontera")
-                console.log("conection " + JSON.stringify(respConection))
+                
                 if (respConection.result) {
                     await sqlite.closeConnection("triplefrontera")
 
@@ -80,7 +76,7 @@ const DetallePaciente: React.FC = () => {
                 //pacientes controles, ultimo control, antecedentes y ubicacion
                 let res: any = await db.query(`SELECT * FROM controles WHERE id_persona=${paciente.id_persona} ORDER BY fecha DESC`);
 
-                let respantecedente: any = await db.query(`SELECT * FROM antecedentes WHERE id_persona=${paciente.id_persona}`)
+                let respantecedente: any = await db.query(`SELECT a.*, s.id_app,m.id_mac FROM antecedentes a LEFT JOIN antecedentes_apps s ON a.id_antecedente=s.id_antecedente LEFT JOIN antecedentes_macs m ON a.id_antecedente=m.id_antecedente WHERE a.id_persona=${paciente.id_persona}`)
                 let respUbicacion: any = await db.query(`SELECT pa.nombre AS pais,a.nombre AS area, p.nombre AS paraje FROM ubicaciones u INNER JOIN parajes p ON u.id_paraje=p.id_paraje INNER JOIN areas a ON p.id_area=a.id_area INNER JOIN paises pa ON a.id_pais=pa.id_pais WHERE u.id_persona=${paciente.id_persona}`)
 
                // setPaciente({ ...paciente, antecedentes: respantecedente.values[0], ubicacion: respUbicacion.values[0] })
@@ -93,15 +89,15 @@ const DetallePaciente: React.FC = () => {
                             await db.query(`SELECT * FROM control_embarazo WHERE id_control=${data.id_control}`)
                                 .then((resp: any) => {
                                     res.values[i].controlembarazada = resp?.values[0]
-                                    console.log("control embarazada " + JSON.stringify(resp.values[0]))
-                                    db.query(`SELECT l.trimestre,l.fecha_realizado,l.resultado,t.nombre FROM laboratorios_realizados l INNER JOIN laboratorios t ON l.id_laboratorio=t.id_laboratorio WHERE l.id_control=${data.id_control}`)
+                                    
+                                    db.query(`SELECT l.id_laboratorio,l.fecha_realizado,l.resultado,t.nombre FROM laboratorios_realizados l INNER JOIN laboratorios t ON l.id_laboratorio=t.id_laboratorio WHERE l.id_control=${data.id_control}`)
                                         .then((respLaboratorio: any) => {
                                             res.values[i].laboratorios = respLaboratorio.values
-                                            console.log("laboratorios  " + JSON.stringify(respLaboratorio.values))
+                                            
                                             db.query(`SELECT * FROM inmunizaciones_control c INNER JOIN inmunizaciones i ON c.id_inmunizacion=i.id_inmunizacion WHERE c.id_control=${data.id_control}`)
                                                 .then((respInmunizacion: any) => {
                                                     res.values[i].inmunizaciones = respInmunizacion.values
-                                                    console.log("inmunizaciones  " + JSON.stringify(respInmunizacion.values))
+                                                    
                                                     setPaciente({ ...paciente, controles: res.values, antecedentes: respantecedente.values[0], ubicacion: respUbicacion.values[0] })
                                                 })
                                         })
@@ -120,7 +116,7 @@ const DetallePaciente: React.FC = () => {
 
                 if (lab) {
                     setTimeout(async function () {
-                        console.log("Laboratorio")
+                        
                         db.close()
                         await sqlite.closeConnection("triplefrontera")
                     }, 2000);
@@ -139,11 +135,14 @@ const DetallePaciente: React.FC = () => {
     }, [])
 
 
-    //console.log(`Paciente ${JSON.stringify(paciente)}`)
+    //
     const printeco = (data: any) => {
         switch (data) {
             case "R":
                 return "Normal"
+                break;
+                case "S":
+                return "Solicitada"
                 break;
             case "P":
                 return "Patologica"
@@ -153,7 +152,7 @@ const DetallePaciente: React.FC = () => {
                 break;
         }
     }
-    console.log("Controles@@@@@ " + JSON.stringify(paciente.controles))
+    console.log("@@@@@ paciente"+JSON.stringify(paciente))
     return (
 
         <IonPage>
@@ -168,9 +167,9 @@ const DetallePaciente: React.FC = () => {
                 </IonToolbar>
             </IonHeader>
             <IonContent >
-                <IonItem>
-                    <IonButton fill="clear" slot='end'><IoCreateOutline size={32} />{" "}Editar</IonButton>
-                </IonItem>
+                <div>
+                    <IonButton expand="block" fill="outline" slot='end' onClick={()=>history.push({ pathname: "/editantecedentes", state: paciente })}><IoCreateOutline size={32} />{" "}Editar Antecedentes</IonButton>
+                </div>
                 <PacienteDatosPersonales paciente={paciente} />
 
                 {paciente.controles?.map((data: any, i: any) => {
@@ -194,9 +193,10 @@ const DetallePaciente: React.FC = () => {
 
                             <IonRow key={i}>
                                 <IonCol>
-                                    <IonCard color="light">
+                                    <IonCard color="light" >
                                         <IonCardHeader>
-                                            <IonCardSubtitle>Fecha de control : {moment(data.fecha).format('LL')}</IonCardSubtitle>
+                                            <IonCardSubtitle >Fecha de control : {moment(data.fecha).format('LL')}</IonCardSubtitle>
+                                            <IonButton  fill="outline" expand="block" onClick={()=>history.push({ pathname: "/editcontrol", state:{data:{data,paciente}}})}><IoCreateOutline size={32} />{" "}Editar Control</IonButton>
                                         </IonCardHeader>
                                         <IonList>
                                             <IonItem lines="full" >
@@ -224,7 +224,7 @@ const DetallePaciente: React.FC = () => {
                                                 {data.inmunizaciones?.map((datos: any, i: any) => {
                                                     return (
                                                         <IonLabel class="ion-text-wrap" slot='end' key={i}>
-                                                            {datos.estado === "S" ? datos.nombre : ""}
+                                                            {datos.estado === "S" || datos.estado === "C"? datos.nombre : ""}
                                                         </IonLabel>
                                                     )
                                                 })}

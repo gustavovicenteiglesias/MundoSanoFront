@@ -11,7 +11,7 @@ const NuevaEmbarazadaAntecedentes:React.FC=()=>{
     const location = useLocation();
     const [paciente, setPaciente] = useState<any>(location.state);
     const history=useHistory()
-    console.log(paciente)
+    
     return(
         <IonPage>
             <IonHeader className="ion-no-border">
@@ -19,7 +19,7 @@ const NuevaEmbarazadaAntecedentes:React.FC=()=>{
                    <IonButtons slot="start" >
                         <IonBackButton defaultHref="/personas" routerAnimation={animationBuilder} />
                     </IonButtons>
-                   <IonLabel slot="end">Antecedentes</IonLabel>
+                   <IonLabel >Antecedentes de {paciente?.nombre} {paciente?.apellido}</IonLabel>
                 </IonToolbar>
             </IonHeader>
             <FormNuevaEmbAtecedentes persona={paciente}></FormNuevaEmbAtecedentes>

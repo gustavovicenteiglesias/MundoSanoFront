@@ -20,7 +20,7 @@ return(
                         </IonItem>
                         <IonItem lines="full">
                             <IonLabel class="ion-text-wrap" slot='start'>Fecha de Nacimiento:</IonLabel>
-                            <IonLabel class="ion-text-wrap" slot='end' color="tertiary">{paciente?.fecha_nacimiento}</IonLabel>
+                            <IonLabel class="ion-text-wrap" slot='end' color="tertiary">{moment(paciente?.fecha_nacimiento).format("YYYY-MM-DD")}</IonLabel>
                         </IonItem>
                         <IonItem lines="full">
                             <IonLabel class="ion-text-wrap" slot='start'>Edad:</IonLabel>

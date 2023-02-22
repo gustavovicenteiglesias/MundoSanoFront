@@ -27,12 +27,12 @@ applyPolyfills().then(() => {
   jeepSqlite(window);
 });
 window.addEventListener('DOMContentLoaded', async () => {
-  console.log('$$$ in index $$$');
+  
   const platform = Capacitor.getPlatform();
   const sqlite: SQLiteConnection = new SQLiteConnection(CapacitorSQLite)
   try {
     if (platform === "web") {
-      console.log("web")
+      
       const jeepEl = document.createElement("jeep-sqlite");
       document.body.appendChild(jeepEl);
       await customElements.whenDefined('jeep-sqlite');
@@ -52,11 +52,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     serviceWorkerRegistration.unregister();
 
     // If you want to start measuring performance in your app, pass a function
-    // to log results (for example: reportWebVitals(console.log))
+    // to log results (for example: reportWebVitals(
     // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
     reportWebVitals();
   } catch (err) {
-    console.log(`Error: ${err}`);
+    
     throw new Error(`Error: ${err}`)
   }
 });

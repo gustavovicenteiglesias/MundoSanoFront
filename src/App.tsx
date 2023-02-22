@@ -31,6 +31,9 @@ import DetallePaciente from './pages/DetallePaciente';
 import { animationBuilder } from './components/AnimationBuilder';
 import NuevaEmbarazada from './pages/NuevaEmbarazada';
 import NuevaEmbarazadaAntecedentes from './pages/NuevaEmbarazadaAntecedentes';
+import NuevaEmbarazadaControl from './pages/NuevaEmbarazadaControl';
+import EditarAntecedentes from './pages/EditarAntecedentes';
+import EditControlEmbrazada from './pages/EditControlEmbarazada';
 
 setupIonicReact();
 
@@ -59,6 +62,15 @@ const App: React.FC = () => {
           </Route>
           <Route exact path="/nuevaembarazadaantecedentes">
             <NuevaEmbarazadaAntecedentes />
+          </Route>
+          <Route exact path="/editantecedentes">
+            <EditarAntecedentes />
+          </Route>
+          <Route exact path="/nuevaembarazadacontrol">
+            <NuevaEmbarazadaControl />
+          </Route>
+          <Route exact path="/editcontrol">
+            <EditControlEmbrazada />
           </Route>
           <Route exact path="/">
             <Redirect to="/home" />
