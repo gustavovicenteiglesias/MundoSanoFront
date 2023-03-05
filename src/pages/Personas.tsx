@@ -51,7 +51,7 @@ const Personas: React.FC = () => {
 
           await db.open();
           let res: any = await db.query("SELECT p.id_persona,p.nombre,p.apellido,p.documento,p.fecha_nacimiento, e.id_etmi,w.nombre AS etmi , s.id_app,f.nombre AS apps,u.id_pais,pa.nombre AS nombre_pais,areas.nombre AS nombre_area,je.nombre AS nombre_paraje FROM personas p LEFT JOIN etmis_personas e ON p.id_persona=e.id_persona LEFT join etmis w ON e.id_etmi=w.id_etmi LEFT join antecedentes a ON p.id_persona=a.id_persona LEFT JOIN antecedentes_apps s ON a.id_antecedente=s.id_antecedente LEFT JOIN apps f ON s.id_app=f.id_app LEFT JOIN ubicaciones u ON p.id_persona=u.id_ubicacion LEFT JOIN paises pa ON u.id_pais=pa.id_pais LEFT JOIN areas ON u.id_area=areas.id_area LEFT JOIN parajes je ON u.id_paraje=je.id_paraje WHERE madre IS NULL ORDER BY p.id_persona ASC")
-          let pendientes: any = await db.query("SELECT c.id_control,em.eco,l.resultado,p.id_persona,p.id_persona,p.nombre,p.apellido,p.documento,p.fecha_nacimiento, e.id_etmi,w.nombre AS etmi , s.id_app, s.id_app,f.nombre AS apps,u.id_pais,pa.nombre AS nombre_pais,areas.nombre AS nombre_area,je.nombre AS nombre_paraje FROM control_embarazo em INNER JOIN controles c ON c.id_control=em.id_control "
+          let pendientes: any = await db.query("SELECT c.id_control,em.eco,l.resultado,p.id_persona,p.id_persona,p.nombre,p.apellido,p.documento,p.fecha_nacimiento, e.id_etmi,w.nombre AS etmi , s.id_app, s.id_app,f.nombre AS apps,u.id_pais,pa.nombre AS nombre_pais,areas.nombre AS nombre_area,je.nombre AS nombre_paraje FROM control_embarazo em LEFT JOIN controles c ON c.id_control=em.id_control "
             + " INNER JOIN laboratorios_realizados l ON c.id_control=l.id_control"
             + " INNER JOIN personas p ON c.id_persona=p.id_persona"
             + " LEFT JOIN etmis_personas e ON p.id_persona=e.id_persona"
@@ -63,7 +63,7 @@ const Personas: React.FC = () => {
             + " LEFT JOIN paises pa ON u.id_pais=pa.id_pais"
             + " LEFT JOIN areas ON u.id_area=areas.id_area "
             + " LEFT JOIN parajes je ON u.id_paraje=je.id_paraje"
-            + ` WHERE em.eco="S" OR l.resultado IS NULL OR l.resultado="S"`)
+            + ` WHERE em.eco="S" OR l.resultado IS NULL OR l.resultado="S" `)
           //+ ` GROUP BY c.id_control,em.eco,l.resultado,p.id_persona,p.nombre,p.apellido,p.documento,p.fecha_nacimiento, e.id_etmi,`
           // + ` w.nombre , s.id_app,f.nombre,u.id_pais `
           // + ` having DUPLICATE > 1`)

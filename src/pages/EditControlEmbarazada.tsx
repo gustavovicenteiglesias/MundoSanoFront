@@ -42,10 +42,10 @@ const inicial_control = {
     resp_glucemia: "S",
     valor_hb: "",
     valor_glucemia: "",
-    valor_grupo_factor:"",
-    resp_grupo_factor:"S",
+    valor_grupo_factor: "",
+    resp_grupo_factor: "S",
 
-    
+
 
 }
 
@@ -53,8 +53,8 @@ const inicial_control = {
 const EditControlEmbrazada: React.FC = () => {
     const location = useLocation();
     const datos = location.state
-    const [dato,setDato]= useState<any>(datos);
-    const [paciente, setPaciente] =useState<any>();
+    const [dato, setDato] = useState<any>(datos);
+    const [paciente, setPaciente] = useState<any>();
     const [control, setControl] = useState<any>(inicial_control)
     const [diferencia, setDiferencia] = useState<any>()
     const [showEcografia, setShowEcografia] = useState<boolean>(false)
@@ -63,13 +63,13 @@ const EditControlEmbrazada: React.FC = () => {
     const [showPap, setShowPap] = useState<boolean>(false)
     const [isLoading, setLoading] = useState<boolean>(false)
     const [inmunizaciones, setInmunizaciones] = useState<any>([])
-    const [motivos,setMotivos]= useState<any>([])
+    const [motivos, setMotivos] = useState<any>([])
     //const [checkSifilis, setCheckSifilis] = useState<boolean>(false)
     //const [checkHVI, setCheckHVI] = useState<boolean>(false)
 
     const hoy = moment()
     //const fum = moment(paciente?.paciente.control.fum)
-   //console.log("fecha "+hoy.format("YYYY-MM-DD"))
+    //console.log("fecha "+hoy.format("YYYY-MM-DD"))
     let sqlite = useSQLite()
     let history = useHistory()
     const handleInputChange = (e: any) => {
@@ -103,11 +103,11 @@ const EditControlEmbrazada: React.FC = () => {
         }
         testDatabaseCopyFromAssets()
     }, [])
-   
+
     useEffect(() => {
         setPaciente(dato.data)
         setControl(dato.data.data.controlembarazada)
-       
+
         dato.data.data?.inmunizaciones.map((data: any, i: any) => {
             switch (data.id_inmunizacion) {
 
@@ -157,7 +157,7 @@ const EditControlEmbrazada: React.FC = () => {
                     if (data.resultado !== "S") {
                         setControl((prevProps: any) => ({ ...prevProps, valor_hb: data.resultado }));
                         setControl((prevProps: any) => ({ ...prevProps, resp_hb: "R" }));
-                    }else{
+                    } else {
                         setControl((prevProps: any) => ({ ...prevProps, resp_hb: "S" }));
                     }
 
@@ -167,7 +167,7 @@ const EditControlEmbrazada: React.FC = () => {
                     if (data.resultado !== "S") {
                         setControl((prevProps: any) => ({ ...prevProps, valor_glucemia: data.resultado }));
                         setControl((prevProps: any) => ({ ...prevProps, resp_glucemia: "R" }));
-                    }else{
+                    } else {
                         setControl((prevProps: any) => ({ ...prevProps, resp_glucemia: "S" }));
                     }
 
@@ -177,7 +177,7 @@ const EditControlEmbrazada: React.FC = () => {
                     if (data.resultado !== "S") {
                         setControl((prevProps: any) => ({ ...prevProps, valor_grupo_factor: data.resultado }));
                         setControl((prevProps: any) => ({ ...prevProps, resp_grupo_factor: "R" }));
-                    }else{
+                    } else {
                         setControl((prevProps: any) => ({ ...prevProps, resp_grupo_factor: "S" }));
                     }
 
@@ -211,19 +211,19 @@ const EditControlEmbrazada: React.FC = () => {
             } else {
                 setshowEco_observa(false)
             }
-            
+
         }
-       
+
         if (dato.data.data?.controlembarazada?.hpv === "R" || dato.data.data?.controlembarazada?.hpv === "P") {
             setControl((prevProps: any) => ({ ...prevProps, hpv_resultado: dato.data.data?.controlembarazada?.hpv }));
             setControl((prevProps: any) => ({ ...prevProps, hpv: "S" }));
-            
+
         }
 
         if (dato.data.data?.controlembarazada?.pap === "R" || dato.data.data?.controlembarazada?.pap === "P") {
             setControl((prevProps: any) => ({ ...prevProps, pap_resultado: dato.data.data?.controlembarazada?.pap }));
             setControl((prevProps: any) => ({ ...prevProps, pap: "S" }));
-            
+
         }
 
     }, [])
@@ -280,17 +280,17 @@ const EditControlEmbrazada: React.FC = () => {
     const OnSubmit = async (e: any) => {
         e.preventDefault()
         setLoading(true)
-        
-        
+
+
         /*Tabla control_embarazo */
         const control_embarazo: any = {};
-       
-        if(control.ecografia==="S"){
-            control_embarazo.eco ="S"
-        }else{
+
+        if (control.ecografia === "S") {
+            control_embarazo.eco = "S"
+        } else {
             control_embarazo.eco = control.ecografia === "N" ? "N" : control.ecografia_resultado;
         }
-        
+
         control_embarazo.detalle_eco = control.eco_observaciones;
         control_embarazo.hpv = control.hpv === "N" ? "N" : control.hpv_resultado;
         control_embarazo.pap = control.pap === "N" ? "N" : control.pap_resultado;
@@ -303,24 +303,24 @@ const EditControlEmbrazada: React.FC = () => {
 
         /*Laboratorio y cerologia */
         const laboratorios: any = {};
-       
-       
 
-        
+
+
+
 
 
 
         //update control embarazada
-       
+
         let resp_control_embrarazo = await consulta(`UPDATE control_embarazo SET edad_gestacional=${Number(control_embarazo.edad_gestacional)},eco="${control_embarazo.eco}",detalle_eco="${control_embarazo.detalle_eco}",
         hpv="${control_embarazo.hpv}",pap="${control_embarazo.pap}",sistolica=${Number(control_embarazo.sistolica)},diastolica=${Number(control_embarazo.diastolica)},
         clinico="${control_embarazo.clinico}",observaciones="${control_embarazo.observaciones}",motivo=${control_embarazo.motivo} WHERE id_control_embarazo=${control.id_control_embarazo}`)
-        
+
         //Insert inmunizaciones
 
         let AGRIPAL = await consulta(`UPDATE inmunizaciones_control SET estado="${control.agripal}"
         WHERE id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control} AND id_inmunizacion=2`)
-        
+
 
         let DB = await consulta(`UPDATE inmunizaciones_control SET estado="${control.db}"
         WHERE id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control} AND id_inmunizacion=3`)
@@ -330,156 +330,222 @@ const EditControlEmbrazada: React.FC = () => {
 
         let VHB = await consulta(`UPDATE inmunizaciones_control SET estado="${control.vhb}"
         WHERE id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control} AND id_inmunizacion=4`)
-        
-        
-        
-        
-        
+
+
+
+
+
         //Insert Laboratorio
         //Sifilis
         if (control.SIFILIS) {
-            let id_laboratorio=await consulta(`SELECT * FROM laboratorios_realizados WHERE id_etmi=3 AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
-            console.log("id_laboratorio "+id_laboratorio)
-            if(Object.keys(id_laboratorio).length!== 0){
+            let id_laboratorio = await consulta(`SELECT * FROM laboratorios_realizados WHERE id_etmi=3 AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
+            console.log("id_laboratorio " + id_laboratorio)
+            if (Object.keys(id_laboratorio).length !== 0) {
                 console.log(" hay id ")
                 let Resp_Sifilis = await consulta(`UPDATE laboratorios_realizados SET resultado="${control.resp_sifilis}",fecha_resultados="${hoy.format("YYYY-MM-DD")}"
-             WHERE id_laboratorio=${id_laboratorio[0].id_laboratorio} AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}` )
-           
-           if (control.resp_sifilis === "P") {
-            
-               let etmis = await consulta(`UPDATE etmis_personas SET confirmada=1 WHERE id_persona=${paciente.data.id_persona} AND id_etmi=3 AND id_control=${paciente.data.id_control} `)
-             
-           }
-            }else{
+             WHERE id_laboratorio=${id_laboratorio[0].id_laboratorio} AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
+
+                if (control.resp_sifilis === "P") {
+
+                    let etmis = await consulta(`UPDATE etmis_personas SET confirmada=1 WHERE id_persona=${paciente.data.id_persona} AND id_etmi=3 AND id_control=${paciente.data.id_control} `)
+
+                }
+            } else {
                 console.log("no  hay id ")
                 let Resp_Sifilis = await consulta(`INSERT INTO laboratorios_realizados
             (id_persona,id_control,id_laboratorio,trimestre,fecha_realizado,fecha_resultados,resultado, id_etmi)
              VALUES (${paciente.data.id_persona},${paciente.data.id_control},1,1,"${hoy.format("YYYY-MM-DD")}",
              "${hoy.format("YYYY-MM-DD")}","${control.resp_sifilis}",3)`)
-            
-            if (control.resp_sifilis === "P") {
-                let etmis = await consulta(`INSERT INTO etmis_personas(id_persona,id_etmi,id_control,confirmada) 
+
+                if (control.resp_sifilis === "P") {
+                    let etmis = await consulta(`INSERT INTO etmis_personas(id_persona,id_etmi,id_control,confirmada) 
                 VALUES (${paciente.data.id_persona},3,${paciente.data.id_control},1)`)
-                
+
+                }
             }
-            }
-            
-       }
+
+        }
         //HIV
-        
+
         if (control.HIV) {
-            let id_laboratorio=await consulta(`SELECT * FROM laboratorios_realizados WHERE id_etmi=2 AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
-            console.log("id_laboratorio hiv "+Object.keys(id_laboratorio).length)
-            if(Object.keys(id_laboratorio).length!== 0){
-                let resp_HIV  = await consulta(`UPDATE laboratorios_realizados SET resultado="${control.resp_hiv}"
-            WHERE id_laboratorio=${id_laboratorio[0].id_laboratorio} AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}` )
-            
-            if (control.resp_hiv === "P") {
-                let etmis = await consulta(`UPDATE etmis_personas SET confirmada=1 WHERE id_persona=${paciente.data.id_persona} AND id_etmi=2 AND id_control=${paciente.data.id_control} `)
-                
-            }
-            }else{
+            let id_laboratorio = await consulta(`SELECT * FROM laboratorios_realizados WHERE id_etmi=2 AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
+            console.log("id_laboratorio hiv " + Object.keys(id_laboratorio).length)
+            if (Object.keys(id_laboratorio).length !== 0) {
+                let resp_HIV = await consulta(`UPDATE laboratorios_realizados SET resultado="${control.resp_hiv}"
+            WHERE id_laboratorio=${id_laboratorio[0].id_laboratorio} AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
+
+                if (control.resp_hiv === "P") {
+                    let etmis = await consulta(`UPDATE etmis_personas SET confirmada=1 WHERE id_persona=${paciente.data.id_persona} AND id_etmi=2 AND id_control=${paciente.data.id_control} `)
+
+                }
+            } else {
                 console.log("no  hay id ")
-                let Resp_Sifilis = await consulta(`INSERT INTO laboratorios_realizados
+                let Resp_hiv = await consulta(`INSERT INTO laboratorios_realizados
             (id_persona,id_control,id_laboratorio,trimestre,fecha_realizado,fecha_resultados,resultado, id_etmi)
              VALUES (${paciente.data.id_persona},${paciente.data.id_control},2,1,"${hoy.format("YYYY-MM-DD")}",
-             "${hoy.format("YYYY-MM-DD")}","${control.resp_sifilis}",2)`)
-            
-            if (control.resp_sifilis === "P") {
-                let etmis = await consulta(`INSERT INTO etmis_personas(id_persona,id_etmi,id_control,confirmada) 
-                VALUES (${paciente.data.id_persona},3,${paciente.data.id_control},1)`)
-                
+             "${hoy.format("YYYY-MM-DD")}","${control.resp_hiv}",2)`)
+
+                if (control.resp_sifilis === "P") {
+                    let etmis = await consulta(`INSERT INTO etmis_personas(id_persona,id_etmi,id_control,confirmada) 
+                VALUES (${paciente.data.id_persona},2,${paciente.data.id_control},1)`)
+
+                }
             }
-            }
-           
-           
-           
-            
+
+
+
+
         }
-        
+
         //CHAGAS
         if (control.CHAGAS) {
-            let id_laboratorio=await consulta(`SELECT * FROM laboratorios_realizados WHERE id_etmi=1 AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
-            let resp_CHAGAS = await consulta(`UPDATE laboratorios_realizados SET resultado="${control.resp_chagas}"
-            WHERE id_laboratorio=${id_laboratorio[0].id_laboratorio} AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}` )
-            
-            
-            if (control.resp_chagas === "P") {
-                let etmis = await consulta(`UPDATE etmis_personas SET confirmada=1 WHERE id_persona=${paciente.data.id_persona} AND id_etmi=1 AND id_control=${paciente.data.id_control} `)
-                
+            let id_laboratorio = await consulta(`SELECT * FROM laboratorios_realizados WHERE id_etmi=1 AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
+            if (Object.keys(id_laboratorio).length !== 0) {
+                let resp_CHAGAS = await consulta(`UPDATE laboratorios_realizados SET resultado="${control.resp_chagas}"
+            WHERE id_laboratorio=${id_laboratorio[0].id_laboratorio} AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
+
+
+                if (control.resp_chagas === "P") {
+                    let etmis = await consulta(`UPDATE etmis_personas SET confirmada=1 WHERE id_persona=${paciente.data.id_persona} AND id_etmi=1 AND id_control=${paciente.data.id_control} `)
+                }
+            } else {
+                console.log("no  hay id ")
+                let Resp_CHAGAS = await consulta(`INSERT INTO laboratorios_realizados
+            (id_persona,id_control,id_laboratorio,trimestre,fecha_realizado,fecha_resultados,resultado, id_etmi)
+             VALUES (${paciente.data.id_persona},${paciente.data.id_control},4,1,"${hoy.format("YYYY-MM-DD")}",
+             "${hoy.format("YYYY-MM-DD")}","${control.resp_chagas}",1)`)
+
+                if (control.resp_chagas === "P") {
+                    let etmis = await consulta(`INSERT INTO etmis_personas(id_persona,id_etmi,id_control,confirmada) 
+                VALUES (${paciente.data.id_persona},1,${paciente.data.id_control},1)`)
+
+                }
             }
         }
-        
+
         //VHB
         if (control.VHB) {
-            let id_laboratorio=await consulta(`SELECT * FROM laboratorios_realizados WHERE id_etmi=4 AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
-            let resp_VHB =await consulta(`UPDATE laboratorios_realizados SET resultado="${control.resp_vhb}"
-            WHERE id_laboratorio=${id_laboratorio[0].id_laboratorio} AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}` )
-            
-            if (control.resp_vhb === "P") {
-                let etmis = await consulta(`UPDATE etmis_personas SET confirmada=1 WHERE id_persona=${paciente.data.id_persona} AND id_etmi=4 AND id_control=${paciente.data.id_control} `)
-                
+            let id_laboratorio = await consulta(`SELECT * FROM laboratorios_realizados WHERE id_etmi=4 AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
+            if (Object.keys(id_laboratorio).length !== 0) {
+                let resp_VHB = await consulta(`UPDATE laboratorios_realizados SET resultado="${control.resp_vhb}"
+            WHERE id_laboratorio=${id_laboratorio[0].id_laboratorio} AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
+
+                if (control.resp_vhb === "P") {
+                    let etmis = await consulta(`UPDATE etmis_personas SET confirmada=1 WHERE id_persona=${paciente.data.id_persona} AND id_etmi=4 AND id_control=${paciente.data.id_control} `)
+
+                }
+            } else {
+                console.log("no  hay id ")
+                let Resp_VHB = await consulta(`INSERT INTO laboratorios_realizados
+            (id_persona,id_control,id_laboratorio,trimestre,fecha_realizado,fecha_resultados,resultado, id_etmi)
+             VALUES (${paciente.data.id_persona},${paciente.data.id_control},5,1,"${hoy.format("YYYY-MM-DD")}",
+             "${hoy.format("YYYY-MM-DD")}","${control.resp_vhb}",4)`)
+
+                if (control.resp_vhb === "P") {
+                    let etmis = await consulta(`INSERT INTO etmis_personas(id_persona,id_etmi,id_control,confirmada) 
+                VALUES (${paciente.data.id_persona},4,${paciente.data.id_control},1)`)
+
+                }
             }
         }
 
         //ESTREPTOCOCO_BETA_HEMOLÍTICO
-        
-        if (control.ESTREPTOCOCO_BETA_HEMOLÍTICO) {
-            let id_laboratorio=await consulta(`SELECT * FROM laboratorios_realizados WHERE id_laboratorio=8 AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
-            let resp_EBH = await consulta(`UPDATE laboratorios_realizados SET resultado="${control.resp_ESTREPTOCOCO_BETA_HEMOLÍTICO}"
-            WHERE id_laboratorio=${id_laboratorio[0].id_laboratorio} AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}` )
-            
 
+        if (control.ESTREPTOCOCO_BETA_HEMOLÍTICO) {
+            let id_laboratorio = await consulta(`SELECT * FROM laboratorios_realizados WHERE id_laboratorio=8 AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
+            if (Object.keys(id_laboratorio).length !== 0) {
+
+                let resp_EBH = await consulta(`UPDATE laboratorios_realizados SET resultado="${control.resp_ESTREPTOCOCO_BETA_HEMOLÍTICO}"
+            WHERE id_laboratorio=${id_laboratorio[0].id_laboratorio} AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
+
+
+            } else {
+                console.log("no  hay id ")
+                let Resp_VHB = await consulta(`INSERT INTO laboratorios_realizados
+        (id_persona,id_control,id_laboratorio,trimestre,fecha_realizado,fecha_resultados,resultado, id_etmi)
+         VALUES (${paciente.data.id_persona},${paciente.data.id_control},8,1,"${hoy.format("YYYY-MM-DD")}",
+         "${hoy.format("YYYY-MM-DD")}","${control.resp_ESTREPTOCOCO_BETA_HEMOLÍTICO}",0)`)
+
+            }
         }
 
         //Hb
-        
+
         if (control.Hb) {
-            let id_laboratorio=await consulta(`SELECT * FROM laboratorios_realizados WHERE id_laboratorio=6 AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
-            console.log("id_laboratorio "+id_laboratorio)
+            let id_laboratorio = await consulta(`SELECT * FROM laboratorios_realizados WHERE id_laboratorio=6 AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
+            console.log("id_laboratorio " + id_laboratorio)
+            if (Object.keys(id_laboratorio).length !== 0) {
+                let respuesta = control.resp_hb === "S" ? "S" : control.valor_hb
+                let resp_HB = await consulta(`UPDATE laboratorios_realizados SET resultado="${respuesta}"
+            WHERE id_laboratorio=${id_laboratorio[0]?.id_laboratorio} AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
 
-            let respuesta = control.resp_hb === "S" ? "S" : control.valor_hb
-            let resp_HB = await consulta(`UPDATE laboratorios_realizados SET resultado="${respuesta}"
-            WHERE id_laboratorio=${id_laboratorio[0]?.id_laboratorio} AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}` )
-            
 
+            } else {
+                console.log("no  hay id ")
+                let respuesta = control.resp_hb === "S" ? "S" : control.valor_hb
+                let Resp_VHB = await consulta(`INSERT INTO laboratorios_realizados
+        (id_persona,id_control,id_laboratorio,trimestre,fecha_realizado,fecha_resultados,resultado, id_etmi)
+         VALUES (${paciente.data.id_persona},${paciente.data.id_control},6,1,"${hoy.format("YYYY-MM-DD")}",
+         "${hoy.format("YYYY-MM-DD")}","${respuesta}",0)`)
+
+            }
         }
 
         //Glucemia resp_glucemia
-        
-        if (control.GLUCEMIA) {
-            let id_laboratorio=await consulta(`SELECT * FROM laboratorios_realizados WHERE id_laboratorio=7 AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
-            let respuesta = control.resp_glucemia === "S" ? "S" : control.valor_glucemia
-            let resp_GLUCEMIA = await consulta(`UPDATE laboratorios_realizados SET resultado="${respuesta}"
-            WHERE id_laboratorio=${id_laboratorio[0].id_laboratorio} AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}` )
-            
 
+        if (control.GLUCEMIA) {
+            let id_laboratorio = await consulta(`SELECT * FROM laboratorios_realizados WHERE id_laboratorio=7 AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
+            if (Object.keys(id_laboratorio).length !== 0) {
+                let respuesta = control.resp_glucemia === "S" ? "S" : control.valor_glucemia
+                let resp_GLUCEMIA = await consulta(`UPDATE laboratorios_realizados SET resultado="${respuesta}"
+            WHERE id_laboratorio=${id_laboratorio[0].id_laboratorio} AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
+
+
+            } else {
+                console.log("no  hay id ")
+                let respuesta = control.resp_glucemia === "S" ? "S" : control.valor_glucemia
+                let Resp_VHB = await consulta(`INSERT INTO laboratorios_realizados
+        (id_persona,id_control,id_laboratorio,trimestre,fecha_realizado,fecha_resultados,resultado, id_etmi)
+         VALUES (${paciente.data.id_persona},${paciente.data.id_control},7,1,"${hoy.format("YYYY-MM-DD")}",
+         "${hoy.format("YYYY-MM-DD")}","${respuesta}",0)`)
+
+            }
         }
         //GRUPO_FACTOR
-       
-        if (control.GRUPO_FACTOR) {
-            let id_laboratorio=await consulta(`SELECT * FROM laboratorios_realizados WHERE id_laboratorio=9 AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
-            let respuesta = control.resp_grupo_factor === "S" ? "S" : control.valor_grupo_factor
-            let resp_GRUPO_FACTOR = await consulta(`UPDATE laboratorios_realizados SET resultado="${respuesta}"
-            WHERE id_laboratorio=${id_laboratorio[0].id_laboratorio} AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}` )
-            
 
+        if (control.GRUPO_FACTOR) {
+            let id_laboratorio = await consulta(`SELECT * FROM laboratorios_realizados WHERE id_laboratorio=9 AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
+            if (Object.keys(id_laboratorio).length !== 0) {
+                let respuesta = control.resp_grupo_factor === "S" ? "S" : control.valor_grupo_factor
+                let resp_GRUPO_FACTOR = await consulta(`UPDATE laboratorios_realizados SET resultado="${respuesta}"
+            WHERE id_laboratorio=${id_laboratorio[0].id_laboratorio} AND id_persona=${paciente.data.id_persona} AND id_control=${paciente.data.id_control}`)
+
+
+            } else {
+                console.log("no  hay id ")
+                let respuesta = control.resp_grupo_factor === "S" ? "S" : control.valor_grupo_factor
+                let Resp_VHB = await consulta(`INSERT INTO laboratorios_realizados
+        (id_persona,id_control,id_laboratorio,trimestre,fecha_realizado,fecha_resultados,resultado, id_etmi)
+         VALUES (${paciente.data.id_persona},${paciente.data.id_control},9,1,"${hoy.format("YYYY-MM-DD")}",
+         "${hoy.format("YYYY-MM-DD")}","${respuesta}",0)`)
+
+            }
         }
 
-        
-        setTimeout(()=>{
+        console.log("@@@@@@control " + JSON.stringify(control))
+        setTimeout(() => {
             setLoading(false)
-           history.push("/personas")
-           window.location.reload()
-        },1000)
+            history.push("/personas")
+            window.location.reload()
+        }, 1000)
     }
 
-    console.log("@@@@@@control "+JSON.stringify(control))
+
 
     const consulta = async (query: string): Promise<any> => {
         try {
             let respConection = await sqlite.isConnection("triplefrontera")
-            
+
             if (respConection.result) {
                 await sqlite.closeConnection("triplefrontera")
 
@@ -497,7 +563,7 @@ const EditControlEmbrazada: React.FC = () => {
             return false;
         }
     }
-    console.log("@@@@@ paciente"+JSON.stringify(paciente))
+    console.log("@@@@@ paciente" + JSON.stringify(paciente))
     return (
         <>
             <IonPage>
@@ -761,7 +827,7 @@ const EditControlEmbrazada: React.FC = () => {
                             <EditLaboratorio titulo="ESTREPTOCOCO BETA HEMOLÍTICO" radio={(e: any) => handleInpuTChecks(e)} radioname="ESTREPTOCOCO_BETA_HEMOLÍTICO" checked={control?.ESTREPTOCOCO_BETA_HEMOLÍTICO} radioOpcion={["S", "P", "N"]} radioOpcionName="resp_ESTREPTOCOCO_BETA_HEMOLÍTICO" radioOpcionValue={(e: any) => handleInputChange(e)} checkedResp={control?.resp_ESTREPTOCOCO_BETA_HEMOLÍTICO} />
                             <EditLaboratorioII titulo="Hb" radio={(e: any) => handleInpuTChecks(e)} radioname="Hb" checked={control?.Hb} radioOpcion={["S", "R"]} radioOpcionName="resp_hb" checkedResp={control?.resp_hb} radioOpcionValue={(e: any) => handleInputChange(e)} inputname="valor_hb" inputvalue={(e: any) => handleInputChange(e)} checkedNumber={control?.valor_hb} />
                             <EditLaboratorioII titulo="GLUCEMIA" radio={(e: any) => handleInpuTChecks(e)} radioname="GLUCEMIA" checked={control?.GLUCEMIA} radioOpcion={["S", "R"]} radioOpcionName="resp_glucemia" checkedResp={control?.resp_glucemia} radioOpcionValue={(e: any) => handleInputChange(e)} inputname="valor_glucemia" inputvalue={(e: any) => handleInputChange(e)} checkedNumber={control?.valor_glucemia} />
-                            <EditLaboratorioIII titulo="GRUPO Y FACTOR" radio={(e: any) => handleInpuTChecks(e)} radioname="GRUPO_FACTOR" checked={control?.GRUPO_FACTOR} radioOpcion={["S", "R"]} radioOpcionName="resp_grupo_factor" checkedResp={control?.resp_grupo_factor} radioOpcionValue={(e: any) => handleInputChange(e)} inputname="valor_grupo_factor" inputvalue={(e: any) => handleInputChange(e)} checkedNumber={control?.valor_grupo_factor}/>
+                            <EditLaboratorioIII titulo="GRUPO Y FACTOR" radio={(e: any) => handleInpuTChecks(e)} radioname="GRUPO_FACTOR" checked={control?.GRUPO_FACTOR} radioOpcion={["S", "R"]} radioOpcionName="resp_grupo_factor" checkedResp={control?.resp_grupo_factor} radioOpcionValue={(e: any) => handleInputChange(e)} inputname="valor_grupo_factor" inputvalue={(e: any) => handleInputChange(e)} checkedNumber={control?.valor_grupo_factor} />
                         </IonCard>
                         <IonCard>
                             <IonCardHeader>
@@ -795,18 +861,18 @@ const EditControlEmbrazada: React.FC = () => {
                                     </IonItem>
                                 </IonRadioGroup>
                                 <IonRadioGroup>
-                                <IonItem>
-                                    <IonLabel>Motivos de Derivacíon</IonLabel>
-                                    <IonSelect name="motivo" onIonChange={e => handleInputChange(e)} value={control?.motivo}>
-                                        <IonSelectOption value={null} >OTRO</IonSelectOption>
-                                        {motivos.map((data: any, i: any) => {
-                                            return (
-                                                <IonSelectOption value={data.id_motivo} key={i}>{data.nombre}</IonSelectOption>
-                                            )
-                                        })}
-                                    </IonSelect>
-                                </IonItem>
-                            </IonRadioGroup>
+                                    <IonItem>
+                                        <IonLabel>Motivos de Derivacíon</IonLabel>
+                                        <IonSelect name="motivo" onIonChange={e => handleInputChange(e)} value={control?.motivo}>
+                                            <IonSelectOption value={null} >OTRO</IonSelectOption>
+                                            {motivos.map((data: any, i: any) => {
+                                                return (
+                                                    <IonSelectOption value={data.id_motivo} key={i}>{data.nombre}</IonSelectOption>
+                                                )
+                                            })}
+                                        </IonSelect>
+                                    </IonItem>
+                                </IonRadioGroup>
                                 <IonItem>
                                     <IonLabel position="floating">Observaciones</IonLabel>
                                     <IonTextarea name="observaciones" onIonChange={e => handleInputChange(e)} value={control?.observaciones}></IonTextarea>

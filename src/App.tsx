@@ -34,6 +34,7 @@ import NuevaEmbarazadaAntecedentes from './pages/NuevaEmbarazadaAntecedentes';
 import NuevaEmbarazadaControl from './pages/NuevaEmbarazadaControl';
 import EditarAntecedentes from './pages/EditarAntecedentes';
 import EditControlEmbrazada from './pages/EditControlEmbarazada';
+import NuevoControl from './pages/NuevoControl';
 
 setupIonicReact();
 
@@ -68,6 +69,9 @@ const App: React.FC = () => {
           </Route>
           <Route exact path="/nuevaembarazadacontrol">
             <NuevaEmbarazadaControl />
+          </Route>
+          <Route exact path="/nuevocontrol">
+            <NuevoControl />
           </Route>
           <Route exact path="/editcontrol">
             <EditControlEmbrazada />

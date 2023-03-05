@@ -170,6 +170,9 @@ const DetallePaciente: React.FC = () => {
                 <div>
                     <IonButton expand="block" fill="outline" slot='end' onClick={()=>history.push({ pathname: "/editantecedentes", state: paciente })}><IoCreateOutline size={32} />{" "}Editar Antecedentes</IonButton>
                 </div>
+                <div>
+                    <IonButton expand="block" fill="outline" slot='end' onClick={()=>history.push({ pathname: "nuevocontrol", state: paciente })}><IoCreateOutline size={32} />{" "}Nuevo Control</IonButton>
+                </div>
                 <PacienteDatosPersonales paciente={paciente} />
 
                 {paciente.controles?.map((data: any, i: any) => {
