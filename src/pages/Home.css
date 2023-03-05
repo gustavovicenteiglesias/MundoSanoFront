@@ -12,6 +12,7 @@ ion-card {
 	box-shadow: none;
     border:solid 1px #aaaaaa !important;
     border-radius: 2px;
+  
 }
 
 .react-datepicker {
