@@ -162,9 +162,13 @@ const FormNuevaEmbAtecedentes: React.FC<any> = ({ datos }) => {
                 //let persona = paciente
                // persona.antecedentes=data_antecedentes
                 GuardarOnSutmit(data_antecedentes)
-                history.push("/personas")
-                window.location.reload()
+                
                 setError("")
+                setTimeout(() => {
+                    
+                     history.push("/personas")
+                     window.location.reload()
+                }, 1000)
             }
         }
     }

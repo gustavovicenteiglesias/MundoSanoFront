@@ -196,8 +196,8 @@ const NuevaEmbarazadaControl: React.FC = () => {
         //Insert control
 
         let resp_numero_control = []
-
-        resp_numero_control = await consulta(`SELECT control_numero FROM controles WHERE id_persona=${ultimo_id_persona[0].id_persona} ORDER BY id_control DESC LIMIT 1`)
+        //id_persona=${ultimo_id_persona[0].id_persona}
+        resp_numero_control = await consulta(`SELECT control_numero FROM controles WHERE id_control BETWEEN 100000 AND 199999  ORDER BY id_control DESC LIMIT 1`)
 
         let ultimo_id_control = await consulta(`SELECT id_control FROM controles WHERE id_control BETWEEN 100000 AND 199999 ORDER BY id_control DESC LIMIT 1`)
         let c = Number(ultimo_id_control[0].id_control) + 1

@@ -237,25 +237,33 @@ const NuevoControl: React.FC = () => {
 
         let resp_numero_control = []
 
-        resp_numero_control = await consulta(`SELECT control_numero FROM controles WHERE id_persona=${paciente.id_persona} ORDER BY id_control DESC LIMIT 1`)
+        resp_numero_control = await consulta(`SELECT control_numero FROM controles WHERE id_control BETWEEN 100000 AND 199999 ORDER BY id_control DESC LIMIT 1`)
 
         let ultimo_id_control = await consulta(`SELECT id_control FROM controles WHERE id_control BETWEEN 100000 AND 199999 ORDER BY id_control DESC LIMIT 1`)
+        console.log("ultimo_control_numero "+JSON.stringify(ultimo_id_control)+" "+JSON.stringify(resp_numero_control))
         let c = Number(ultimo_id_control[0].id_control) + 1
-
+        let n=Number(resp_numero_control[0].control_numero) + 1
         if (resp_numero_control.length === 0) {
 
             await consulta(`INSERT INTO controles(id_control,fecha,id_persona,control_numero,id_estado)
              VALUES (${c},"${hoy.format("YYYY-MM-DD")}",
              ${Number(paciente.id_persona)},1,1)`)
+             console.log("ultimo_control_numero c if "+c)
             console.log("paso if ")
         } else {
-            await consulta(`INSERT INTO controles(id_control,fecha,id_persona,control_numero,id_estado)
+            const resp_else=await consulta(`INSERT INTO controles(id_control,fecha,id_persona,control_numero,id_estado)
             VALUES (${c},"${hoy.format("YYYY-MM-DD")}",
-            ${Number(paciente.id_persona)},${Number(resp_numero_control[0].control_numero) + 1},1)`)
+            ${Number(paciente.id_persona)},${n},1)`)
+            console.log("ultimo_control_numero c else "+c)
             console.log("paso else ")
+            console.log("QQQQQ resp_else"+resp_else)
         }
 
-
+        setTimeout(() => {
+            
+             //history.push("/personas")
+            // window.location.reload()
+        }, 1000)
         //antecedentes_insert(paciente?.antecedente,Number(ultimo_id_control[0].id_control))
 
         //insert control embarazada
@@ -419,7 +427,7 @@ const NuevoControl: React.FC = () => {
                     <IonButtons slot="start" >
                         <IonBackButton defaultHref="/personas" routerAnimation={animationBuilder} />
                     </IonButtons>
-                    <IonLabel >Controles de {paciente?.nombre} {paciente?.apellido}</IonLabel>
+                    <IonLabel >Controles de {paciente?.nombre} {paciente?.apellido} </IonLabel>
                 </IonToolbar>
             </IonHeader>
             <IonContent>
