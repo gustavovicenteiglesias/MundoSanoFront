@@ -8,7 +8,24 @@ import { SQLiteDBConnection } from "@capacitor-community/sqlite";
 import moment from "moment";
 import LaboratorioCerologiaII from "../components/LaboratorioCerologiaII";
 import LaboratorioCerologiaIII from "../components/LaboratorioCerologiaIII";
+interface antecedentes {
+    id_antecedente?: number,
+    id_persona?: number,
+    id_control?: number,
+    edad_primer_embarazo?: number | null,
+    fecha_ultimo_embarazo?: string | null,
+    gestas?: number | 0,
+    partos?: number | 0,
+    cesareas?: number | 0,
+    abortos?: number | 0,
+    planificado?: number | null,
+    fum?: string | null,
+    fpp?: string | null,
+    fecha?: Date,
+    id_app: number | null,
+    id_mac: number | null
 
+}
 const inicial_control = {
     ecografia: "N",
     hpv: "N",
@@ -61,6 +78,7 @@ const NuevoControl: React.FC = () => {
     
     let sqlite = useSQLite()
     let history = useHistory()
+    console.log("FUM "+paciente?.antecedentes.fum)
     useEffect(() => {
         setControl((prevProps: any) => ({ ...prevProps, gestas: hoy.diff(paciente?.antecedentes.fum, "weeks") }));
 
@@ -172,7 +190,48 @@ const NuevoControl: React.FC = () => {
         control_embarazo.motivo = control.motivo
         control_embarazo.derivada=control.derivada
 
-
+        const antecedentes_insert = async (data:antecedentes,idControl:any): Promise<any> => {
+            try {
+                let respConection = await sqlite.isConnection("triplefrontera")
+                
+                if (respConection.result) {
+                    await sqlite.closeConnection("triplefrontera")
+    
+                }
+                let db: SQLiteDBConnection = await sqlite.createConnection("triplefrontera")
+                await db.open();
+                let res: any = await db.query(`UPDATE antecedentes SET edad_primer_embarazo=${data.edad_primer_embarazo},fecha_ultimo_embarazo="${data.fecha_ultimo_embarazo}",
+                gestas=${data.gestas},partos=${data.partos},cesareas=${data.cesareas},abortos=${data.abortos},planificado=${data.planificado},
+                fum="${data.fum}",fpp="${data.fpp}",id_control=${idControl} WHERE id_antecedente=${data.id_antecedente}`)
+                console.log("opdate "+ JSON.stringify(res))
+               
+                if (paciente.antecedentes.id_app===null) {
+    
+                    let insert_ante=paciente.antecedentes.id_app===data.id_app?null: await db.query(`INSERT INTO antecedentes_apps(id_antecedente, id_app) VALUES (${data.id_antecedente},${data.id_app})`)
+                    
+                }else{
+                    const res_app_antecedentes=data.id_app!==null?await db.query(`UPDATE antecedentes_apps SET id_app=${data.id_app} WHERE  id_antecedente=${data.id_antecedente}`):null
+                
+                }
+    
+                if (paciente.antecedentes.id_mac===null) {
+                    
+                    let insert_antes=paciente.antecedentes.id_mac===data.id_mac?null:await db.query(`INSERT INTO antecedentes_macs(id_antecedente, id_mac) VALUES (${data.id_antecedente},${data.id_mac})`)
+                    console.log("etmis_insert"+JSON.stringify(insert_antes))
+                }else{
+                   let res_mac_antecedentes=data.id_mac!==null?await db.query(`UPDATE antecedentes_macs SET id_mac=${data.id_mac} WHERE  id_antecedente=${data.id_antecedente}`):null
+                    console.log("etmis_update"+JSON.stringify(res_mac_antecedentes))
+                }
+    
+                
+                db.close()
+                await sqlite.closeConnection("triplefrontera")
+                return true;
+            }
+            catch (error: any) {
+                return false;
+            }
+        }
         
         //Insert control
 
@@ -188,17 +247,19 @@ const NuevoControl: React.FC = () => {
             await consulta(`INSERT INTO controles(id_control,fecha,id_persona,control_numero,id_estado)
              VALUES (${c},"${hoy.format("YYYY-MM-DD")}",
              ${Number(paciente.id_persona)},1,1)`)
-            //
+            console.log("paso if ")
         } else {
             await consulta(`INSERT INTO controles(id_control,fecha,id_persona,control_numero,id_estado)
             VALUES (${c},"${hoy.format("YYYY-MM-DD")}",
             ${Number(paciente.id_persona)},${Number(resp_numero_control[0].control_numero) + 1},1)`)
+            console.log("paso else ")
         }
 
 
-
+        //antecedentes_insert(paciente?.antecedente,Number(ultimo_id_control[0].id_control))
 
         //insert control embarazada
+        ultimo_id_control = await consulta(`SELECT id_control FROM controles WHERE id_control BETWEEN 100000 AND 199999 ORDER BY id_control DESC LIMIT 1`)
         let ultimo_id_control_embarazada = await consulta(`SELECT id_control_embarazo FROM control_embarazo WHERE id_control_embarazo BETWEEN 100000 AND 199999 ORDER BY id_control_embarazo DESC LIMIT 1`)
         let resp_control_embrarazo = await consulta(`INSERT INTO control_embarazo(id_control_embarazo,id_control,edad_gestacional,eco,detalle_eco,hpv,pap,sistolica,diastolica, clinico, observaciones,motivo,derivada) 
         VALUES (${Number(ultimo_id_control_embarazada[0].id_control_embarazo) + 1},${Number(ultimo_id_control[0].id_control)},${control_embarazo.edad_gestacional},
@@ -323,11 +384,12 @@ const NuevoControl: React.FC = () => {
         setTimeout(() => {
             setLoading(false)
              history.push("/personas")
+             window.location.reload()
         }, 1000)
     }
 
 
-    console.log("@@@@@@control " + JSON.stringify(control))
+    console.log("@@@@@@control " + JSON.stringify(paciente))
     const consulta = async (query: string): Promise<any> => {
         try {
             let respConection = await sqlite.isConnection("triplefrontera")

@@ -225,7 +225,7 @@ const EditControlEmbrazada: React.FC = () => {
             setControl((prevProps: any) => ({ ...prevProps, pap: "S" }));
 
         }
-
+        setControl((prevProps: any) => ({ ...prevProps, edad_gestacional: hoy.diff(dato.data.paciente?.antecedentes.fum, "weeks") }));
     }, [])
 
 

@@ -22,7 +22,7 @@ const EditarAntecedentes:React.FC=()=>{
                    <IonLabel >Antecedentes de {paciente?.nombre} {paciente?.apellido}</IonLabel>
                 </IonToolbar>
             </IonHeader>
-            <FormEditAntecedentes datos={paciente.antecedentes}></FormEditAntecedentes>
+            <FormEditAntecedentes datos={paciente}></FormEditAntecedentes>
         </IonPage>
     )
 }

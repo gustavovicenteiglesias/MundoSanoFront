@@ -55,6 +55,7 @@ const FormNuevaEmbAtecedentes: React.FC<any> = ({ datos }) => {
    const [macs, setMacs] = useState<any>([])
     const [apps, setApps] = useState<any>([])
     const [ante, setAnte] = useState<any>()
+    const [paciente,setPaciente]= useState<any>()
    const [error, setError] = useState<string>("")
 
     const history = useHistory()
@@ -71,10 +72,10 @@ const FormNuevaEmbAtecedentes: React.FC<any> = ({ datos }) => {
             await db.open();
             let res: any = await db.query(`UPDATE antecedentes SET edad_primer_embarazo=${data.edad_primer_embarazo},fecha_ultimo_embarazo="${data.fecha_ultimo_embarazo}",
             gestas=${data.gestas},partos=${data.partos},cesareas=${data.cesareas},abortos=${data.abortos},planificado=${data.planificado},
-            fum="${data.fum}",fpp="${data.fpp}" WHERE ${data.id_antecedente}`)
-            
+            fum="${data.fum}",fpp="${data.fpp}" WHERE id_antecedente=${data.id_antecedente}`)
+            console.log("opdate "+ JSON.stringify(res))
            
-            if (datos.id_app===null) {
+            if (datos.antecedentes.id_app===null) {
 
                 let insert_ante=datos.id_app===data.id_app?null: await db.query(`INSERT INTO antecedentes_apps(id_antecedente, id_app) VALUES (${data.id_antecedente},${data.id_app})`)
                 
@@ -83,13 +84,13 @@ const FormNuevaEmbAtecedentes: React.FC<any> = ({ datos }) => {
             
             }
 
-            if (datos.id_mac===null) {
+            if (datos.antecedentes.id_mac===null) {
                 
                 let insert_antes=datos.id_mac===data.id_mac?null:await db.query(`INSERT INTO antecedentes_macs(id_antecedente, id_mac) VALUES (${data.id_antecedente},${data.id_mac})`)
-                
+                console.log("etmis_insert"+JSON.stringify(insert_antes))
             }else{
-                const res_mac_antecedentes=data.id_mac!==null?await db.query(`UPDATE antecedentes_macs SET id_mac=${data.id_mac} WHERE  id_antecedente=${data.id_antecedente}`):null
-            
+               let res_mac_antecedentes=data.id_mac!==null?await db.query(`UPDATE antecedentes_macs SET id_mac=${data.id_mac} WHERE  id_antecedente=${data.id_antecedente}`):null
+                console.log("etmis_update"+JSON.stringify(res_mac_antecedentes))
             }
 
             
@@ -158,10 +159,11 @@ const FormNuevaEmbAtecedentes: React.FC<any> = ({ datos }) => {
                 } else {
                     data_antecedentes.planificado = 0
                 }
-                
+                //let persona = paciente
+               // persona.antecedentes=data_antecedentes
                 GuardarOnSutmit(data_antecedentes)
-                .then(()=>history.push("/personas"))
-                
+                history.push("/personas")
+                window.location.reload()
                 setError("")
             }
         }
@@ -197,14 +199,15 @@ const FormNuevaEmbAtecedentes: React.FC<any> = ({ datos }) => {
         testDatabaseCopyFromAssets()
     }, [])
     useEffect(() => {
-        setAnte(datos)
+        setAnte(datos.antecedentes)
+        setPaciente(datos)
     }, [])
 
     useEffect(() => {
 
     }, [error])
-
-   
+   // console.log("datos "+JSON.stringify(datos))
+   //console.log("ante   "+JSON.stringify(ante))
     return (
         <IonContent>
             <form onSubmit={(e) => onSubmit(e)}>
