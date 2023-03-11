@@ -179,11 +179,13 @@ const FormNuevaEmbAtecedentes: React.FC<any> = ({ datos }) => {
         const testDatabaseCopyFromAssets = async (): Promise<any> => {
             try {
                 let respConection = await sqlite.isConnection("triplefrontera")
-                
-                if (respConection.result) {
-                    await sqlite.closeConnection("triplefrontera")
-
-                }
+              
+                    
+                    if (respConection.result) {
+                        await sqlite.closeConnection("triplefrontera")
+        
+                    }
+                setTimeout(()=>{},500)
                 let db: SQLiteDBConnection = await sqlite.createConnection("triplefrontera")
                 await db.open();
                 let res: any = await db.query("SELECT * FROM macs")

@@ -14,50 +14,51 @@ const FilterComponent: React.FC<any> = ({ onFilter, onClear, filterText }) => {
     const [parajes, setParajes] = useState<any>([])
     const [showArea, setShowArea] = useState<boolean>(true)
     const [showParaje, setShowParaje] = useState<boolean>(true)
-    
-   
-   
-   useEffect(() => {
-    const testDatabaseCopyFromAssets = async (): Promise<any> => {
-        try {
-            let respConection = await sqlite.isConnection("triplefrontera")
-            
-            if (respConection.result) {
-                await sqlite.closeConnection("triplefrontera")
+
+
+
+    useEffect(() => {
+        const testDatabaseCopyFromAssets = async (): Promise<any> => {
+            try {
+                let respConection = await sqlite.isConnection("triplefrontera")
+
+                
+                    await sqlite.closeConnection("triplefrontera")
+
                
+
+                let db: SQLiteDBConnection = await sqlite.createConnection("triplefrontera")
+
+                await db.open();
+
+                let resEtmi = await db.query(`SELECT * FROM etmis`)
+                let respais: any = await db.query("SELECT * FROM paises")
+                setPaises(respais.values)
+
+                let resArea: any = await db.query(`SELECT * FROM areas `)
+                setArea(resArea.values)
+
+                let resParaje: any = await db.query(`SELECT * FROM parajes `)
+                setParaje(resParaje.values)
+
+
+                setComboEtmi(resEtmi.values)
+
+                db.close()
+                await sqlite.closeConnection("triplefrontera")
+                return true;
             }
-            
-            let db: SQLiteDBConnection = await sqlite.createConnection("triplefrontera")
-
-            await db.open();
-
-            let resEtmi = await db.query(`SELECT * FROM etmis`)
-            let respais: any = await db.query("SELECT * FROM paises")
-            setPaises(respais.values)
-           
-            let resArea: any = await db.query(`SELECT * FROM areas `)
-            setArea(resArea.values)
-            
-            let resParaje: any = await db.query(`SELECT * FROM parajes `)
-            setParaje(resParaje.values)
-            
-
-            setComboEtmi(resEtmi.values)
-
-            db.close()
-            await sqlite.closeConnection("triplefrontera")
-            return true;
+            catch (error: any) {
+                console.log("error conexion")
+                return false;
+            }
         }
-        catch (error: any) {
-            return false;
-        }
-    }
-   
+
         testDatabaseCopyFromAssets()
     }, [])
 
-    const onHandlePais = async(e: any) => {
-       onFilter(e)
+    const onHandlePais = async (e: any) => {
+        onFilter(e)
         if (e.target.value !== "") {
             let id_pais = 0
             setShowArea(false)
@@ -93,16 +94,16 @@ const FilterComponent: React.FC<any> = ({ onFilter, onClear, filterText }) => {
                     id_pais = 0
                     break;
             }
-            setAreas(area.filter((item: any) => item.id_pais===id_pais))
-         } else {
+            setAreas(area.filter((item: any) => item.id_pais === id_pais))
+        } else {
             setShowArea(true)
             setShowParaje(true)
         }
     }
-    const onHandleArea=(e:any)=>{
-        
+    const onHandleArea = (e: any) => {
+
         onFilter(e)
-       
+
         if (e.target.value !== "") {
             let id_area = 0
             setShowParaje(false)
@@ -119,13 +120,13 @@ const FilterComponent: React.FC<any> = ({ onFilter, onClear, filterText }) => {
                 case "ALTO LA SIERRA":
                     id_area = 4
                     break;
-                
+
                 default:
                     id_area = 0
                     break;
             }
-            setParajes(paraje.filter((item: any) => item.id_area===id_area))
-         } else {
+            setParajes(paraje.filter((item: any) => item.id_area === id_area))
+        } else {
             setShowParaje(true)
         }
     }
@@ -133,9 +134,9 @@ const FilterComponent: React.FC<any> = ({ onFilter, onClear, filterText }) => {
     return (
         <>
             <IonGrid>
-                
+
                 <IonRow>
-                 
+
                     <IonCol size-xs="12" size-sm="4">
                         <IonList>
                             <IonItem>

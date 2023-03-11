@@ -44,7 +44,8 @@ const inicial_control = {
     valor_glucemia: "",
     valor_grupo_factor: "",
     resp_grupo_factor: "S",
-
+    motivo:9,
+    derivada:0
 
 
 }
@@ -553,10 +554,13 @@ const EditControlEmbrazada: React.FC = () => {
             let db: SQLiteDBConnection = await sqlite.createConnection("triplefrontera")
             await db.open();
             let res: any = await db.query(query)
-
+            setTimeout(() => {
+                
+            }, 1000)
 
             db.close()
             await sqlite.closeConnection("triplefrontera")
+
             return res.values;
         }
         catch (error: any) {
@@ -864,7 +868,7 @@ const EditControlEmbrazada: React.FC = () => {
                                     <IonItem>
                                         <IonLabel>Motivos de Derivacíon</IonLabel>
                                         <IonSelect name="motivo" onIonChange={e => handleInputChange(e)} value={control?.motivo}>
-                                            <IonSelectOption value={null} >OTRO</IonSelectOption>
+                                            
                                             {motivos.map((data: any, i: any) => {
                                                 return (
                                                     <IonSelectOption value={data.id_motivo} key={i}>{data.nombre}</IonSelectOption>

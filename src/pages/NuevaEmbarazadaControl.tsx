@@ -8,6 +8,7 @@ import { SQLiteDBConnection } from "@capacitor-community/sqlite";
 import moment from "moment";
 import LaboratorioCerologiaII from "../components/LaboratorioCerologiaII";
 import LaboratorioCerologiaIII from "../components/LaboratorioCerologiaIII";
+import { maximo, minimo } from "../components/constantes";
 
 const inicial_control = {
     ecografia: "N",
@@ -39,7 +40,7 @@ const inicial_control = {
     resp_ESTREPTOCOCO_BETA_HEMOLÍTICO: "N",
     resp_hb: "S",
     resp_glucemia: "S",
-    motivo: null,
+    motivo:9,
     derivada:0
 
 }
@@ -177,29 +178,30 @@ const NuevaEmbarazadaControl: React.FC = () => {
         const laboratorios: any = {};
         //laboratorios.sifilis
         //Insert tabla personas
-        let ultimo_id_persona = await consulta("SELECT id_persona FROM personas WHERE id_persona BETWEEN 100000 AND 199999 ORDER BY id_persona DESC LIMIT 1")
+        
+        let ultimo_id_persona = await consulta(`SELECT id_persona FROM personas WHERE id_persona BETWEEN  ${minimo} AND ${maximo} ORDER BY id_persona DESC LIMIT 1`)
         await consulta(`INSERT INTO personas(id_persona,apellido,nombre,documento,fecha_nacimiento,id_origen,nacionalidad,sexo,madre,alta,nacido_vivo) 
        VALUES  (${Number(ultimo_id_persona[0].id_persona) + 1},"${paciente.paciente.apellido}","${paciente.paciente.nombre}",
        "${paciente.paciente.documento}","${paciente.paciente.fecha_nacimiento}",2,12,"F",${paciente.paciente.madre},${paciente.paciente.alta},${paciente.paciente.nacido_vivo})`
         )
         //INsert tabla ubicacion
 
-        let ultimo_id_ubicacion = await consulta("SELECT id_ubicacion FROM ubicaciones WHERE id_persona BETWEEN 100000 AND 199999 ORDER BY id_persona DESC LIMIT 1")
+        let ultimo_id_ubicacion = await consulta(`SELECT id_ubicacion FROM ubicaciones WHERE id_persona BETWEEN ${minimo} AND ${maximo} ORDER BY id_persona DESC LIMIT 1`)
 
-        ultimo_id_persona = await consulta("SELECT id_persona FROM personas WHERE id_persona BETWEEN 100000 AND 199999 ORDER BY id_persona DESC LIMIT 1")
+        ultimo_id_persona = await consulta(`SELECT id_persona FROM personas WHERE id_persona BETWEEN ${minimo} AND ${maximo} ORDER BY id_persona DESC LIMIT 1`)
 
         await consulta(`INSERT INTO ubicaciones(id_ubicacion, id_persona, id_paraje,id_area,num_vivienda,fecha, georeferencia, id_pais) 
         VALUES (${Number(ultimo_id_persona[0].id_persona)},${Number(ultimo_id_persona[0].id_persona)},${paciente.paciente.paraje_residencia},
         ${paciente.paciente.area_residencia},"${paciente.paciente.num_vivienda}","${moment(paciente.control.fecha).format("YYYY-MM-DD")}","${paciente.paciente.latitud},${paciente.paciente.longitud}",${paciente.paciente.pais_residencia})`)
-        ultimo_id_ubicacion = await consulta("SELECT id_ubicacion FROM ubicaciones WHERE id_persona BETWEEN 100000 AND 199999 ORDER BY id_persona DESC LIMIT 1")
+        ultimo_id_ubicacion = await consulta(`SELECT id_ubicacion FROM ubicaciones WHERE id_persona ${minimo} AND ${maximo} ORDER BY id_persona DESC LIMIT 1`)
 
         //Insert control
 
         let resp_numero_control = []
         //id_persona=${ultimo_id_persona[0].id_persona}
-        resp_numero_control = await consulta(`SELECT control_numero FROM controles WHERE id_control BETWEEN 100000 AND 199999  ORDER BY id_control DESC LIMIT 1`)
+        resp_numero_control = await consulta(`SELECT control_numero FROM controles WHERE id_control BETWEEN ${minimo} AND ${maximo}  ORDER BY id_control DESC LIMIT 1`)
 
-        let ultimo_id_control = await consulta(`SELECT id_control FROM controles WHERE id_control BETWEEN 100000 AND 199999 ORDER BY id_control DESC LIMIT 1`)
+        let ultimo_id_control = await consulta(`SELECT id_control FROM controles WHERE id_control BETWEEN ${minimo} AND ${maximo} ORDER BY id_control DESC LIMIT 1`)
         let c = Number(ultimo_id_control[0].id_control) + 1
 
         if (resp_numero_control.length === 0) {
@@ -215,8 +217,8 @@ const NuevaEmbarazadaControl: React.FC = () => {
         }
 
         //insert antecedentes
-        ultimo_id_control = await consulta(`SELECT id_control FROM controles WHERE id_control BETWEEN 100000 AND 199999 ORDER BY id_control DESC LIMIT 1`)
-        let ultimo_id_antecedentes = await consulta(`SELECT id_antecedente FROM antecedentes WHERE id_antecedente BETWEEN 100000 AND 199999 ORDER BY id_antecedente DESC LIMIT 1`)
+        ultimo_id_control = await consulta(`SELECT id_control FROM controles WHERE id_control BETWEEN ${minimo} AND ${maximo} ORDER BY id_control DESC LIMIT 1`)
+        let ultimo_id_antecedentes = await consulta(`SELECT id_antecedente FROM antecedentes WHERE id_antecedente BETWEEN ${minimo} AND ${maximo} ORDER BY id_antecedente DESC LIMIT 1`)
 
         let antecedentes = await consulta(`INSERT INTO antecedentes(id_antecedente,id_persona,id_control,edad_primer_embarazo,
             fecha_ultimo_embarazo,gestas,partos,cesareas, abortos, planificado, fum, fpp) 
@@ -227,7 +229,7 @@ const NuevaEmbarazadaControl: React.FC = () => {
 
         //si hay apps insertar en la tabla antecedentes_apps
         if (paciente.control.app !== undefined) {
-            ultimo_id_antecedentes = await consulta(`SELECT id_antecedente FROM antecedentes WHERE id_antecedente BETWEEN 100000 AND 199999 ORDER BY id_antecedente DESC LIMIT 1`)
+            ultimo_id_antecedentes = await consulta(`SELECT id_antecedente FROM antecedentes WHERE id_antecedente BETWEEN ${minimo} AND ${maximo} ORDER BY id_antecedente DESC LIMIT 1`)
             let apps_antecedentes = await consulta(`INSERT INTO antecedentes_apps(id_antecedente, id_app)
                  VALUES (${Number(ultimo_id_antecedentes[0]?.id_antecedente)},${paciente.control.app})`)
 
@@ -251,11 +253,12 @@ const NuevaEmbarazadaControl: React.FC = () => {
 
 
         //insert control embarazada
-        let ultimo_id_control_embarazada = await consulta(`SELECT id_control_embarazo FROM control_embarazo WHERE id_control_embarazo BETWEEN 100000 AND 199999 ORDER BY id_control_embarazo DESC LIMIT 1`)
+        let ultimo_id_control_embarazada = await consulta(`SELECT id_control_embarazo FROM control_embarazo WHERE id_control_embarazo BETWEEN ${minimo} AND ${maximo} ORDER BY id_control_embarazo DESC LIMIT 1`)
         let resp_control_embrarazo = await consulta(`INSERT INTO control_embarazo(id_control_embarazo,id_control,edad_gestacional,eco,detalle_eco,hpv,pap,sistolica,diastolica, clinico, observaciones,motivo,derivada) 
         VALUES (${Number(ultimo_id_control_embarazada[0].id_control_embarazo) + 1},${Number(ultimo_id_control[0].id_control)},${control_embarazo.edad_gestacional},
         "${control_embarazo.eco}","${control_embarazo.detalle_eco}","${control_embarazo.hpv}","${control_embarazo.pap}",
         ${control_embarazo.sistolica},${control_embarazo.diastolica},"${control_embarazo.clinico}","${control_embarazo.observaciones}","${control_embarazo.motivo}",${control_embarazo.derivada})`)
+        
         console.log("@@@@@ Insert control_embarazada ", JSON.stringify(resp_control_embrarazo))
 
         //Insert inmunizaciones
@@ -719,7 +722,7 @@ const NuevaEmbarazadaControl: React.FC = () => {
                                 <IonItem>
                                     <IonLabel>Motivos de Derivacíon</IonLabel>
                                     <IonSelect name="motivo" onIonChange={e => handleInputChange(e)}>
-                                        <IonSelectOption value={null} >OTRO</IonSelectOption>
+                                        
                                         {motivos.map((data: any, i: any) => {
                                             return (
                                                 <IonSelectOption value={data.id_motivo} key={i}>{data.nombre}</IonSelectOption>

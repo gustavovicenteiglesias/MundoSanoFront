@@ -9,6 +9,7 @@ import DataTable from 'react-data-table-component';
 import { useHistory } from 'react-router';
 import { IoAddCircleOutline } from 'react-icons/io5';
 import FilterComponent from '../components/FilterComponent';
+
 //import './Home.css';
 
 const Personas: React.FC = () => {
@@ -87,7 +88,7 @@ const Personas: React.FC = () => {
           // setPaises(JSON.parse(res.values) )
           db.close()
           await sqlite.closeConnection("triplefrontera")
-        }, 1000)
+        }, 500)
         return true;
       }
       catch (error: any) {

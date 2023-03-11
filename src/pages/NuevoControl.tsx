@@ -8,6 +8,7 @@ import { SQLiteDBConnection } from "@capacitor-community/sqlite";
 import moment from "moment";
 import LaboratorioCerologiaII from "../components/LaboratorioCerologiaII";
 import LaboratorioCerologiaIII from "../components/LaboratorioCerologiaIII";
+import { maximo, minimo } from "../components/constantes";
 interface antecedentes {
     id_antecedente?: number,
     id_persona?: number,
@@ -56,7 +57,7 @@ const inicial_control = {
     resp_ESTREPTOCOCO_BETA_HEMOLÍTICO: "N",
     resp_hb: "S",
     resp_glucemia: "S",
-    motivo: null,
+    motivo: 9,
     derivada:0
 
 }
@@ -189,7 +190,7 @@ const NuevoControl: React.FC = () => {
         control_embarazo.observaciones = control.observaciones;
         control_embarazo.motivo = control.motivo
         control_embarazo.derivada=control.derivada
-
+        
         const antecedentes_insert = async (data:antecedentes,idControl:any): Promise<any> => {
             try {
                 let respConection = await sqlite.isConnection("triplefrontera")
@@ -237,9 +238,9 @@ const NuevoControl: React.FC = () => {
 
         let resp_numero_control = []
 
-        resp_numero_control = await consulta(`SELECT control_numero FROM controles WHERE id_control BETWEEN 100000 AND 199999 ORDER BY id_control DESC LIMIT 1`)
+        resp_numero_control = await consulta(`SELECT control_numero FROM controles WHERE id_control BETWEEN ${minimo} AND ${maximo} ORDER BY id_control DESC LIMIT 1`)
 
-        let ultimo_id_control = await consulta(`SELECT id_control FROM controles WHERE id_control BETWEEN 100000 AND 199999 ORDER BY id_control DESC LIMIT 1`)
+        let ultimo_id_control = await consulta(`SELECT id_control FROM controles WHERE id_control BETWEEN ${minimo} AND ${maximo} ORDER BY id_control DESC LIMIT 1`)
         console.log("ultimo_control_numero "+JSON.stringify(ultimo_id_control)+" "+JSON.stringify(resp_numero_control))
         let c = Number(ultimo_id_control[0].id_control) + 1
         let n=Number(resp_numero_control[0].control_numero) + 1
@@ -267,8 +268,8 @@ const NuevoControl: React.FC = () => {
         //antecedentes_insert(paciente?.antecedente,Number(ultimo_id_control[0].id_control))
 
         //insert control embarazada
-        ultimo_id_control = await consulta(`SELECT id_control FROM controles WHERE id_control BETWEEN 100000 AND 199999 ORDER BY id_control DESC LIMIT 1`)
-        let ultimo_id_control_embarazada = await consulta(`SELECT id_control_embarazo FROM control_embarazo WHERE id_control_embarazo BETWEEN 100000 AND 199999 ORDER BY id_control_embarazo DESC LIMIT 1`)
+        ultimo_id_control = await consulta(`SELECT id_control FROM controles WHERE id_control BETWEEN ${minimo} AND ${maximo} ORDER BY id_control DESC LIMIT 1`)
+        let ultimo_id_control_embarazada = await consulta(`SELECT id_control_embarazo FROM control_embarazo WHERE id_control_embarazo BETWEEN ${minimo} AND ${maximo} ORDER BY id_control_embarazo DESC LIMIT 1`)
         let resp_control_embrarazo = await consulta(`INSERT INTO control_embarazo(id_control_embarazo,id_control,edad_gestacional,eco,detalle_eco,hpv,pap,sistolica,diastolica, clinico, observaciones,motivo,derivada) 
         VALUES (${Number(ultimo_id_control_embarazada[0].id_control_embarazo) + 1},${Number(ultimo_id_control[0].id_control)},${control_embarazo.edad_gestacional},
         "${control_embarazo.eco}","${control_embarazo.detalle_eco}","${control_embarazo.hpv}","${control_embarazo.pap}",
@@ -413,6 +414,9 @@ const NuevoControl: React.FC = () => {
 
             db.close()
             await sqlite.closeConnection("triplefrontera")
+            setTimeout(() => {
+                
+            }, 1000)
             return res.values;
         }
         catch (error: any) {
@@ -737,7 +741,7 @@ const NuevoControl: React.FC = () => {
                                 <IonItem>
                                     <IonLabel>Motivos de Derivacíon</IonLabel>
                                     <IonSelect name="motivo" onIonChange={e => handleInputChange(e)}>
-                                        <IonSelectOption value={null} >OTRO</IonSelectOption>
+                                        
                                         {motivos.map((data: any, i: any) => {
                                             return (
                                                 <IonSelectOption value={data.id_motivo} key={i}>{data.nombre}</IonSelectOption>

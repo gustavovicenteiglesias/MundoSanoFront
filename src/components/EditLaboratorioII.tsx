@@ -51,7 +51,7 @@ const LaboratorioCerologia: React.FC<any> = ({titulo,radio,radioname,radioOpcion
                 </IonRadioGroup>
                 <IonItem>
                     <IonLabel position="floating">Ingrese Valor</IonLabel>
-                    <IonInput type="number" name={inputname} onIonChange={e => handleInputChangeInput(e)} value={checkedNumber}></IonInput>
+                    <IonInput type="text" name={inputname} onIonChange={e => handleInputChangeInput(e)} value={checkedNumber}></IonInput>
                 </IonItem>
             </IonCol>}
             </IonRow>

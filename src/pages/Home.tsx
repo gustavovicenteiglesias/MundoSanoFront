@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { SQLiteDBConnection, useSQLite } from 'react-sqlite-hook';
 
 import LocalizacionTrabajo from '../components/LocalizacionTrabajo';
+import Personas from './Personas';
 
 //import './Home.css';
 
@@ -48,8 +49,8 @@ useEffect(()=>{
   testDatabaseCopyFromAssets()
 }, [])
   return (
-
-    <IonPage>
+    <Personas/>
+    /*<IonPage>
     <IonContent className='content-border'>
       <IonGrid>
         <IonRow>
@@ -68,7 +69,7 @@ useEffect(()=>{
 
       </IonGrid>
     </IonContent>
-    </IonPage>
+  </IonPage>*/
 
   );
 };
