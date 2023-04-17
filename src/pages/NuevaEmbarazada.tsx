@@ -1,4 +1,4 @@
-import { IonBackButton, IonButton, IonButtons, IonContent, IonDatetime, IonHeader, IonInput, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonSelect, IonSelectOption, IonTitle, IonToolbar, useIonAlert } from "@ionic/react"
+import { IonBackButton, IonButton, IonButtons, IonContent, IonDatetime, IonDatetimeButton, IonModal, IonHeader, IonInput, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonSelect, IonSelectOption, IonTitle, IonToolbar, useIonAlert, IonCol } from "@ionic/react"
 import FormularioNuevaEmbarazada from "../components/FormularioNuevaEmbarazada"
 import { animationBuilder } from "../components/AnimationBuilder"
 import { useHistory, useLocation } from "react-router"
@@ -10,6 +10,7 @@ import moment from "moment"
 import { Controller, useForm } from "react-hook-form"
 import { Geolocation } from '@capacitor/geolocation';
 import { ErrorMessage } from "@hookform/error-message"
+
 import e from "express"
 
 interface persona {
@@ -35,17 +36,17 @@ interface persona {
 }
 const NuevaEmbarazada: React.FC = () => {
 
-    const [datapicker, setDataPicker] = useState<boolean>(false)
+
     const [fecha, setFecha] = useState<string>()
-    const [fecha1, setFecha1] = useState<string>()
+    const [fecha1, setFecha1] = useState<any>(null)
     const [origen, setOrigen] = useState<any>([])
     const [paises, setPaises] = useState<any>([])
     const [area, setArea] = useState<any>([])
     const [parajes, setParaje] = useState<any>([])
     const [paciente, setPaciente] = useState<persona>()
     const [loading, setLoading] = useState<boolean>(false)
-    
-
+    const [datapicker, setDataPicker] = useState<boolean>(false)
+    const [error,setError]= useState<string>()
     const [showAlert, hideAlert] = useIonAlert();
     let sqlite = useSQLite()
     const history = useHistory()
@@ -62,7 +63,7 @@ const NuevaEmbarazada: React.FC = () => {
             apellido: "",
             documento: null,
             fecha_nacimiento: "",
-            
+
             pais_residencia: "",
             area_residencia: "",
             paraje_residencia: ""
@@ -70,10 +71,9 @@ const NuevaEmbarazada: React.FC = () => {
     });
 
     const fechaNacimiento = (e: any) => {
-        const dia = moment(e.detail.value).format("DD-MM-YYYY")
-        
+        const dia = moment(e.detail.value).format("YYYY-MM-DD")
         setDataPicker(false)
-        setPaciente((prevProps) => ({ ...prevProps, fecha_nacimiento: moment(e.detail.value).format("YYYY-MM-DD") }))
+        setPaciente((prevProps) => ({ ...prevProps, fecha_nacimiento: dia }))
         setFecha1(dia)
         setFecha(e.detail.value)
         setValue('fecha_nacimiento', e.detail.value)
@@ -85,7 +85,7 @@ const NuevaEmbarazada: React.FC = () => {
                 setPaciente((prevProps) => ({ ...prevProps, latitud: resp.coords.latitude }))
                 setPaciente((prevProps) => ({ ...prevProps, longitud: resp.coords.longitude }))
             })
-        
+
     };
 
     const handleInputChange = (e: any) => {
@@ -95,20 +95,24 @@ const NuevaEmbarazada: React.FC = () => {
 
 
     const onSubmit = (data: any) => {
-       
-        //alert(JSON.stringify(data, null, 2));
-         data.alta=paciente?.alta;
-         data.area_residencia=paciente?.area_residencia;
-         data.fecha_nacimiento=data.fecha_nacimiento;
-         data.latitud=paciente?.latitud;
-         data.longitud=paciente?.longitud;
-         data.madre=paciente?.madre;
-         data.nacido_vivo=paciente?.nacido_vivo;
-         data.num_vivienda=paciente?.num_vivienda;
+        if(fecha1===null){
+            setError("Por favor indica una fecha de nacimiento")
+        }else{
+            //alert(JSON.stringify(data, null, 2));
+        data.alta = paciente?.alta;
+        data.area_residencia = paciente?.area_residencia;
+        data.fecha_nacimiento = data.fecha_nacimiento;
+        data.latitud = paciente?.latitud;
+        data.longitud = paciente?.longitud;
+        data.madre = paciente?.madre;
+        data.nacido_vivo = paciente?.nacido_vivo;
+        data.num_vivienda = paciente?.num_vivienda;
 
 
 
         history.push({ pathname: "/nuevaembarazadaantecedentes", state: data })
+        }
+        
     };
 
 
@@ -127,7 +131,7 @@ const NuevaEmbarazada: React.FC = () => {
         const testDatabaseCopyFromAssets = async (): Promise<any> => {
             try {
                 let respConection = await sqlite.isConnection("triplefrontera")
-                
+
                 if (respConection.result) {
                     await sqlite.closeConnection("triplefrontera")
 
@@ -154,7 +158,7 @@ const NuevaEmbarazada: React.FC = () => {
         testDatabaseCopyFromAssets()
     }, [paciente])
     //
-   
+    console.log("@@@@@@paciente " + JSON.stringify(paciente))
     return (
         <IonPage>
             <IonHeader className="ion-no-border">
@@ -172,14 +176,12 @@ const NuevaEmbarazada: React.FC = () => {
                         <IonItem>
                             <IonLabel position="floating">Nombre</IonLabel>
                             <IonInput
-                                onIonChange={(event:any) => {
-                                    event.target.value = event.target.value.toUpperCase();}}
+                                onIonChange={(event: any) => {
+                                    event.target.value = event.target.value.toUpperCase();
+                                }}
                                 {...register('nombre', {
                                     required: 'Este campo es requerido',
-                                    pattern: {
-                                        value: /^[A-ZÁÉÍÓÚa-zñáéíóú\s]+$/,
-                                        message: 'Nombre incorrecto'
-                                    },
+
 
                                 })}
                             />
@@ -192,14 +194,12 @@ const NuevaEmbarazada: React.FC = () => {
                         <IonItem>
                             <IonLabel position="floating">Apellido</IonLabel>
                             <IonInput
-                             onIonChange={(event:any) => {
-                                event.target.value = event.target.value.toUpperCase();}}
+                                onIonChange={(event: any) => {
+                                    event.target.value = event.target.value.toUpperCase();
+                                }}
                                 {...register('apellido', {
                                     required: 'Este campo es requerido',
-                                    pattern: {
-                                        value: /^[A-ZÁÉÍÓÚa-zñáéíóú]+$/,
-                                        message: 'Nombre incorrecto'
-                                    },
+
 
                                 })}
                             />
@@ -212,7 +212,7 @@ const NuevaEmbarazada: React.FC = () => {
                         <IonItem>
                             <IonLabel position="floating">Documento</IonLabel>
                             <IonInput
-                            placeholder="55666888"
+                                placeholder="55666888"
                                 {...register('documento', {
                                     required: 'Este campo es requerido',
                                     pattern: {
@@ -231,33 +231,16 @@ const NuevaEmbarazada: React.FC = () => {
                         {/* === ION DATE TIME === */}
                         <IonItem>
                             <IonLabel position="stacked">Fecha de Nacimiento</IonLabel>
-                            <IonInput onClick={() => setDataPicker(true)} value={fecha1} {...register('fecha_nacimiento', { required: 'must pick date' })}></IonInput>
+                            {fecha1 === null || fecha1 === "null" ? <IonButton onClick={(e) => setDataPicker(true)} size="small" >Fecha de Nacimiento</IonButton> : <IonDatetimeButton datetime="datetime" ></IonDatetimeButton>}
 
-                            {datapicker &&
-                                <Controller
-                                    render={({ field }) => (
-                                        <IonDatetime
-                                            presentation="date"
-                                            onIonChange={(e) => { fechaNacimiento(e) }}
-                                            value={field.value}
-
-                                        />
-
-                                    )}
-                                    control={control}
-                                    name="fecha_nacimiento"
-                                    rules={{ required: 'This is a required field' }}
-                                />
-                            }
-
+                            
                         </IonItem>
-                        <ErrorMessage
-                            errors={errors}
-                            name="fecha_nacimiento"
-                            as={<div style={{ color: 'red' }} />}
-                        />
 
                     </IonList>
+                    
+                    <IonCol>
+                            <div><IonLabel color="danger"> {error} </IonLabel></div>
+                        </IonCol>
                     <IonList>
                         {/* === SELECTS UBICACION PAIS === */}
                         <IonListHeader color="secondary">
@@ -327,8 +310,8 @@ const NuevaEmbarazada: React.FC = () => {
                             />
                         </IonItem>
                         <IonItem>
-                        <IonLabel position="floating">Número de Vivienda</IonLabel>
-                        <IonInput name="num_vivienda" type="number" onIonChange={(e) => handleInputChange(e)}></IonInput>
+                            <IonLabel position="floating">Número de Vivienda</IonLabel>
+                            <IonInput name="num_vivienda" type="number" onIonChange={(e) => handleInputChange(e)}></IonInput>
                         </IonItem>
                     </IonList>
                     <IonList>
@@ -342,8 +325,26 @@ const NuevaEmbarazada: React.FC = () => {
                             <IonLabel>{paciente?.longitud}</IonLabel>
                         </IonItem>
                     </IonList>
+                    <IonModal keepContentsMounted={true} isOpen={datapicker} onDidDismiss={(e) => setDataPicker(false)} className="ion-datetime-button-overlay">
+                        <IonDatetime
+                            id="datetime"
+                            name="fecha_nacimiento"
+                            onIonChange={(e) => fechaNacimiento(e)}
+                            presentation="date"
+                            showDefaultButtons={true}
+                            showClearButton
+                            doneText="Confirmar"
+                            cancelText="Cancelar"
+                            clearText="Limpiar"
+                            placeholder="fecha"
+                            onIonCancel={(e) => setDataPicker(false)}
+                            
+
+                        />
+                    </IonModal>
                     <IonButton type="submit" expand="block">{loading ? "Enviando" : "Enviar"} </IonButton>
                 </form>
+
             </IonContent>
         </IonPage>
     )

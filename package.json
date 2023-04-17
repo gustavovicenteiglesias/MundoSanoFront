@@ -22,7 +22,7 @@
     "moment": "^2.29.4",
     "react": "^18.1.0",
     "react-data-table-component": "^7.5.3",
-    "react-datepicker": "^4.8.0",
+    "react-datepicker": "^4.10.0",
     "react-dom": "^18.1.0",
     "react-hook-form": "^7.41.1",
     "react-icons": "^4.7.1",
@@ -73,7 +73,7 @@
   "devDependencies": {
     "@capacitor/cli": "^4.6.1",
     "@ionic/cli": "6.19.0",
-    "@types/react-datepicker": "^4.8.0",
+    "@types/react-datepicker": "^4.10.0",
     "@types/react-dom": "^16.9.17",
     "jeep-sqlite": "^1.6.7",
     "react-scripts": "5.0.1",

@@ -79,9 +79,14 @@ const NuevoControl: React.FC = () => {
     
     let sqlite = useSQLite()
     let history = useHistory()
-    console.log("FUM "+paciente?.antecedentes.fum)
+    //console.log("FUM "+paciente?.antecedentes?.fum)
     useEffect(() => {
-        setControl((prevProps: any) => ({ ...prevProps, gestas: hoy.diff(paciente?.antecedentes.fum, "weeks") }));
+        if(paciente?.antecedentes?.fum!==null){
+            setControl((prevProps: any) => ({ ...prevProps, gestas: hoy.diff(paciente?.antecedentes?.fum, "weeks") }));
+        }else{
+            setControl((prevProps: any) => ({ ...prevProps, gestas: 0 }));
+        }
+        
 
     }, [])
 
@@ -181,7 +186,7 @@ const NuevoControl: React.FC = () => {
             control_embarazo.eco = control.ecografia === "N" ? "N" : control.ecografia_resultado;
         }
 
-        control_embarazo.detalle_eco = control.eco_observaciones;
+        control_embarazo.detalle_eco = control.eco_observaciones===null?null: control.eco_observaciones;
         control_embarazo.hpv = control.hpv === "N" ? "N" : control.hpv_resultado;
         control_embarazo.pap = control.pap === "N" ? "N" : control.pap_resultado;
         control_embarazo.sistolica = control.sistolica;
@@ -201,9 +206,12 @@ const NuevoControl: React.FC = () => {
                 }
                 let db: SQLiteDBConnection = await sqlite.createConnection("triplefrontera")
                 await db.open();
-                let res: any = await db.query(`UPDATE antecedentes SET edad_primer_embarazo=${data.edad_primer_embarazo},fecha_ultimo_embarazo="${data.fecha_ultimo_embarazo}",
+                let update_fecha_ultimo_embarazo=data.fecha_ultimo_embarazo===null||data.fecha_ultimo_embarazo==="null"?null:"\""+data.fecha_ultimo_embarazo+"\""
+                let update_fum=data?.fum===null||data?.fum==="null"?null:"\""+data.fum+"\""
+                let update_fpp=data?.fpp===null||data?.fpp==="null"?null:"\""+data.fpp+"\""
+                let res: any = await db.query(`UPDATE antecedentes SET edad_primer_embarazo=${data.edad_primer_embarazo},fecha_ultimo_embarazo=${update_fecha_ultimo_embarazo},
                 gestas=${data.gestas},partos=${data.partos},cesareas=${data.cesareas},abortos=${data.abortos},planificado=${data.planificado},
-                fum="${data.fum}",fpp="${data.fpp}",id_control=${idControl} WHERE id_antecedente=${data.id_antecedente}`)
+                fum=${update_fum},fpp=${update_fpp},id_control=${idControl} WHERE id_antecedente=${data.id_antecedente}`)
                 console.log("opdate "+ JSON.stringify(res))
                
                 if (paciente.antecedentes.id_app===null) {
@@ -429,7 +437,7 @@ const NuevoControl: React.FC = () => {
             <IonHeader className="ion-no-border">
                 <IonToolbar>
                     <IonButtons slot="start" >
-                        <IonBackButton defaultHref="/personas" routerAnimation={animationBuilder} />
+                        <IonBackButton defaultHref="/personas" disabled={isLoading} routerAnimation={animationBuilder} />
                     </IonButtons>
                     <IonLabel >Controles de {paciente?.nombre} {paciente?.apellido} </IonLabel>
                 </IonToolbar>
@@ -437,7 +445,7 @@ const NuevoControl: React.FC = () => {
             <IonContent>
                 <form onSubmit={OnSubmit}>
                     <IonItem>
-                        <IonLabel position="floating">Edad Gestacional (FUM {moment(paciente?.antecedentes.fum).format("LL")})</IonLabel>
+                        <IonLabel position="floating">Edad Gestacional (FUM {moment(paciente?.antecedentes?.fum).format("LL")})</IonLabel>
                         <IonInput type="number" defaultValue={diferencia} value={control?.gestas} name="gestas" onIonChange={e => handleInputChange(e)} ></IonInput>
                     </IonItem>
                     {/* Ecografia */}

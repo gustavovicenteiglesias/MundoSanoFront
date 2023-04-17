@@ -23,9 +23,11 @@ const FilterComponent: React.FC<any> = ({ onFilter, onClear, filterText }) => {
                 let respConection = await sqlite.isConnection("triplefrontera")
 
                 
-                    await sqlite.closeConnection("triplefrontera")
+                 
+                await sqlite.closeConnection("triplefrontera")
 
-               
+
+           
 
                 let db: SQLiteDBConnection = await sqlite.createConnection("triplefrontera")
 

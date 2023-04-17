@@ -1,5 +1,5 @@
 
-import { IonAccordion, IonAccordionGroup, IonButton, IonCol, IonContent, IonDatetime, IonInput, IonItem, IonLabel, IonNote, IonRadio, IonRadioGroup, IonRow, IonSelect, IonSelectOption } from "@ionic/react"
+import { IonAccordion, IonAccordionGroup, IonButton, IonButtons, IonCol, IonContent, IonDatetime, IonDatetimeButton, IonInput, IonItem, IonLabel, IonModal, IonNote, IonRadio, IonRadioGroup, IonRow, IonSelect, IonSelectOption } from "@ionic/react"
 import moment from "moment"
 import { useEffect, useRef, useState } from "react"
 import { useSQLite } from "react-sqlite-hook"
@@ -52,48 +52,54 @@ const FormNuevaEmbAtecedentes: React.FC<any> = ({ datos }) => {
     const [datapicker, setDataPicker] = useState<boolean>(false)
     const [datapicker1, setDataPicker1] = useState<boolean>(false)
     const [datapicker2, setDataPicker2] = useState<boolean>(false)
-   const [macs, setMacs] = useState<any>([])
+    const [macs, setMacs] = useState<any>([])
     const [apps, setApps] = useState<any>([])
     const [ante, setAnte] = useState<any>()
-    const [paciente,setPaciente]= useState<any>()
-   const [error, setError] = useState<string>("")
+    const [paciente, setPaciente] = useState<any>()
+    const [error, setError] = useState<string>("")
+    const [isLoading, setLoading] = useState<boolean>(false)
 
     const history = useHistory()
     const ref = useRef("")
-    const GuardarOnSutmit = async (data:antecedentes): Promise<any> => {
+    const GuardarOnSutmit = async (data: antecedentes): Promise<any> => {
         try {
             let respConection = await sqlite.isConnection("triplefrontera")
-            
+
             if (respConection.result) {
                 await sqlite.closeConnection("triplefrontera")
 
             }
             let db: SQLiteDBConnection = await sqlite.createConnection("triplefrontera")
             await db.open();
-            let res: any = await db.query(`UPDATE antecedentes SET edad_primer_embarazo=${data.edad_primer_embarazo},fecha_ultimo_embarazo="${data.fecha_ultimo_embarazo}",
+            let update_fecha_ultimo_embarazo = data.fecha_ultimo_embarazo === null || data.fecha_ultimo_embarazo === "null" ? null : "\"" + data.fecha_ultimo_embarazo + "\""
+            let update_fum = data?.fum === null || data?.fum === "null" ? null : "\"" + data.fum + "\""
+            let update_fpp = data?.fpp === null || data?.fpp === "null" ? null : "\"" + data.fpp + "\""
+
+            let res: any = await db.query(`UPDATE antecedentes SET edad_primer_embarazo=${data.edad_primer_embarazo},fecha_ultimo_embarazo=${update_fecha_ultimo_embarazo},
             gestas=${data.gestas},partos=${data.partos},cesareas=${data.cesareas},abortos=${data.abortos},planificado=${data.planificado},
-            fum="${data.fum}",fpp="${data.fpp}" WHERE id_antecedente=${data.id_antecedente}`)
-            console.log("opdate "+ JSON.stringify(res))
-           
-            if (datos.antecedentes.id_app===null) {
+            fum=${update_fum},fpp=${update_fpp} WHERE id_antecedente=${data.id_antecedente}`)
+            console.log("opdate " + JSON.stringify(res))
 
-                let insert_ante=datos.id_app===data.id_app?null: await db.query(`INSERT INTO antecedentes_apps(id_antecedente, id_app) VALUES (${data.id_antecedente},${data.id_app})`)
-                
-            }else{
-                const res_app_antecedentes=data.id_app!==null?await db.query(`UPDATE antecedentes_apps SET id_app=${data.id_app} WHERE  id_antecedente=${data.id_antecedente}`):null
-            
+            if (datos.antecedentes.id_app === null) {
+                console.log("@@@@@data" + datos.antecedentes.id_app)
+                console.log("@@@@@datammm" + data.id_app)
+                let insert_ante = datos.id_app === data.id_app ? null : await db.query(`INSERT INTO antecedentes_apps(id_antecedente, id_app) VALUES (${data.id_antecedente},10)`)
+
+            } else {
+                const res_app_antecedentes = data.id_app !== null ? await db.query(`UPDATE antecedentes_apps SET id_app=${data.id_app} WHERE  id_antecedente=${data.id_antecedente}`) : null
+
             }
 
-            if (datos.antecedentes.id_mac===null) {
-                
-                let insert_antes=datos.id_mac===data.id_mac?null:await db.query(`INSERT INTO antecedentes_macs(id_antecedente, id_mac) VALUES (${data.id_antecedente},${data.id_mac})`)
-                console.log("etmis_insert"+JSON.stringify(insert_antes))
-            }else{
-               let res_mac_antecedentes=data.id_mac!==null?await db.query(`UPDATE antecedentes_macs SET id_mac=${data.id_mac} WHERE  id_antecedente=${data.id_antecedente}`):null
-                console.log("etmis_update"+JSON.stringify(res_mac_antecedentes))
+            if (datos.antecedentes.id_mac === null) {
+
+                let insert_antes = datos.id_mac === data.id_mac ? null : await db.query(`INSERT INTO antecedentes_macs(id_antecedente, id_mac) VALUES (${data.id_antecedente},6)`)
+                console.log("etmis_insert" + JSON.stringify(insert_antes))
+            } else {
+                let res_mac_antecedentes = data.id_mac !== null ? await db.query(`UPDATE antecedentes_macs SET id_mac=${data.id_mac} WHERE  id_antecedente=${data.id_antecedente}`) : null
+                console.log("etmis_update" + JSON.stringify(res_mac_antecedentes))
             }
 
-            
+
             db.close()
             await sqlite.closeConnection("triplefrontera")
             return true;
@@ -102,50 +108,59 @@ const FormNuevaEmbAtecedentes: React.FC<any> = ({ datos }) => {
             return false;
         }
     }
-    
+
     const fechaNacimiento = (e: any) => {
         const dia = moment(e.detail.value).format("YYYY-MM-DD")
-        
+        const diahoy = moment().format("YYYY-MM-DD")
         setDataPicker(false)
         //setFecha(e.detail.value)
         //setFecha1(dia)
         const { name, value } = e.target;
-        setAnte((prevProps:any) => ({ ...prevProps, [name]: dia }));
-        
+
+        if (dia !== "Fecha inválida") setAnte((prevProps: any) => ({ ...prevProps, [name]: dia }));
+
     }
     const fecha_FUM = (e: any) => {
-        const dia = moment(e.detail.value).format("DD-MM-YYYY")
-        
+        const dia = moment(e.detail.value).format("YYYY-MM-DD")
+
         setDataPicker1(false)
         const { name, value } = e.target;
-        setAnte((prevProps:any) => ({ ...prevProps, [name]: value }));
+        if (dia !== "Fecha inválida") setAnte((prevProps: any) => ({ ...prevProps, [name]: dia }))
     }
 
     const fecha_FPP = (e: any) => {
-        const dia = moment(e.detail.value).format("DD-MM-YYYY")
+        const dia = moment(e.detail.value).format("YYYY-MM-DD")
         setDataPicker2(false)
-         const { name, value } = e.target;
-        setAnte((prevProps:any) => ({ ...prevProps, [name]: value }));
+        const { name, value } = e.target;
+        if (dia !== "Fecha inválida") setAnte((prevProps: any) => ({ ...prevProps, [name]: dia }));
     }
 
     const calculoFPP = (e: any) => {
-        const dia = moment(ante?.fum).add(280, 'days').format("YYYY-MM-DD")
-        setAnte((prevProps:any) => ({ ...prevProps, fpp: dia }));
+        if (ante?.fum !== null) {
+            const dia = moment(ante?.fum).add(280, 'days').format("YYYY-MM-DD")
+            setAnte((prevProps: any) => ({ ...prevProps, fpp: dia }));
+        }
+
+    }
+
+    const calculoFUM = (e: any) => {
+        const dia = moment(ante?.fpp).add(-280, 'days').format("YYYY-MM-DD")
+        setAnte((prevProps: any) => ({ ...prevProps, fum: dia }));
     }
 
     const handleInputChange = (e: any) => {
         const { name, value } = e.target;
-        setAnte((prevProps:any) => ({ ...prevProps, [name]: value }));
+        setAnte((prevProps: any) => ({ ...prevProps, [name]: value }));
     }
 
     const onSubmit = (e: any) => {
         e.preventDefault()
 
 
-        
-        
-        
-        if (ante?.abortos !== undefined &&ante?.cesareas!== undefined && ante?.partos!== undefined && ante?.gestas !== undefined) {
+
+
+
+        if (ante?.abortos !== undefined && ante?.cesareas !== undefined && ante?.partos !== undefined && ante?.gestas !== undefined) {
             if ((Number(ante?.abortos) + Number(ante?.cesareas) + Number(ante?.partos)) > (Number(ante?.gestas) - 1)) {
 
                 setError("La suma de abortos , cesareas y partos no puede superar la cantidad de gestaciones ")
@@ -153,21 +168,21 @@ const FormNuevaEmbAtecedentes: React.FC<any> = ({ datos }) => {
                 let data_antecedentes = ante;
 
                 data_antecedentes.fecha = new Date()
-               
+
                 if (ante.planificado) {
                     data_antecedentes.planificado = 1
                 } else {
                     data_antecedentes.planificado = 0
                 }
                 //let persona = paciente
-               // persona.antecedentes=data_antecedentes
+                // persona.antecedentes=data_antecedentes
                 GuardarOnSutmit(data_antecedentes)
-                
+
                 setError("")
                 setTimeout(() => {
-                    
-                     history.push("/personas")
-                     window.location.reload()
+
+                    history.push("/personas")
+                    window.location.reload()
                 }, 1000)
             }
         }
@@ -179,20 +194,20 @@ const FormNuevaEmbAtecedentes: React.FC<any> = ({ datos }) => {
         const testDatabaseCopyFromAssets = async (): Promise<any> => {
             try {
                 let respConection = await sqlite.isConnection("triplefrontera")
-              
-                    
-                    if (respConection.result) {
-                        await sqlite.closeConnection("triplefrontera")
-        
-                    }
-                setTimeout(()=>{},500)
+
+
+                if (respConection.result) {
+                    await sqlite.closeConnection("triplefrontera")
+
+                }
+                setTimeout(() => { }, 500)
                 let db: SQLiteDBConnection = await sqlite.createConnection("triplefrontera")
                 await db.open();
                 let res: any = await db.query("SELECT * FROM macs")
-                
+
                 setMacs(res.values)
                 let resAPP: any = await db.query("SELECT * FROM apps")
-                
+
                 setApps(resAPP.values)
                 db.close()
                 await sqlite.closeConnection("triplefrontera")
@@ -212,8 +227,8 @@ const FormNuevaEmbAtecedentes: React.FC<any> = ({ datos }) => {
     useEffect(() => {
 
     }, [error])
-   // console.log("datos "+JSON.stringify(datos))
-   //console.log("ante   "+JSON.stringify(ante))
+    // console.log("datos "+JSON.stringify(datos))
+    console.log("ante   " + JSON.stringify(ante))
     return (
         <IonContent>
             <form onSubmit={(e) => onSubmit(e)}>
@@ -227,9 +242,26 @@ const FormNuevaEmbAtecedentes: React.FC<any> = ({ datos }) => {
                     <IonCol>
                         <IonItem>
                             <IonLabel position="stacked">Fecha de último parto</IonLabel>
-                            <IonInput onClick={() => setDataPicker(true)} name="fecha_ultimo_embarazo" value={ante?.fecha_ultimo_embarazo}></IonInput>
+                            {/* <IonInput onClick={() => setDataPicker(true)} name="fecha_ultimo_embarazo" value={ante?.fecha_ultimo_embarazo}></IonInput>*/}
+                            
+                            {ante?.fecha_ultimo_embarazo === null || ante?.fecha_ultimo_embarazo === "null" ? <IonButton onClick={() => setDataPicker(true)} size="small" slot="end">Fecha Último Embarazo</IonButton> : <IonDatetimeButton datetime="datetimeultimo" slot="end"></IonDatetimeButton>}
+                            <IonModal keepContentsMounted={true} isOpen={datapicker} className="ion-datetime-button-overlay" onDidDismiss={() => setDataPicker(false)}>
+                                <IonDatetime
+                                    id="datetimeultimo"
+                                    name="fecha_ultimo_embarazo"
+                                    onIonChange={(e) => fechaNacimiento(e)}
+                                    presentation="date"
+                                    showDefaultButtons={true}
+                                    doneText="Confirmar"
+                                    showClearButton
+                                    cancelText="Cancelar"
+                                    clearText="Limpiar"
+                                    value={ante?.fecha_ultimo_embarazo}
+                                    onIonCancel={() => setDataPicker(false)}
 
-                            {datapicker && <IonDatetime presentation="date" name="fecha_ultimo_embarazo" onIonChange={(e) => fechaNacimiento(e)} value={ante?.fecha_ultimo_embarazo}></IonDatetime>}
+                                />
+                            </IonModal>
+                            {/*datapicker && <IonDatetime presentation="date" name="fecha_ultimo_embarazo" onIonChange={(e) => fechaNacimiento(e)} value={ante?.fecha_ultimo_embarazo}></IonDatetime>*/}
                         </IonItem>
 
                     </IonCol>
@@ -304,19 +336,57 @@ const FormNuevaEmbAtecedentes: React.FC<any> = ({ datos }) => {
                     <IonCol>
                         <IonItem>
                             <IonLabel position="stacked">Fecha Última Menstruación</IonLabel>
-                            <IonInput onClick={() => setDataPicker1(true)} name="fum" >{ante?.fum}</IonInput>
+                            {/*<IonInput onClick={() => setDataPicker1(true)} name="fum" >{ante?.fum}</IonInput>*/}
+                            <IonButton onClick={() => setAnte((prevProps: any) => ({ ...prevProps, fum: null }))} size="small" slot="end">Limpiar</IonButton>
+                            {ante?.fum === null || ante?.fum === "null" ? <IonButton onClick={(e) => setDataPicker1(true)} size="small" slot="end">Fum</IonButton> : <IonDatetimeButton datetime="datetimeeditarfum" slot="end"></IonDatetimeButton>}
+                            <IonModal keepContentsMounted={true} isOpen={datapicker1} className="ion-datetime-button-overlay" onDidDismiss={(e) => setDataPicker1(false)}>
+                                <IonDatetime
+                                
+                                    id="datetimeeditarfum"
+                                    name="fum"
+                                    onIonChange={(e) => fecha_FUM(e)}
+                                    presentation="date"
+                                    showDefaultButtons={true}
+                                    doneText="Confirmar"
+                                    showClearButton
+                                    cancelText="Cancelar"
+                                    clearText="Limpiar"
+                                    value={ante?.fum}
+                                    onIonCancel={(e) => setDataPicker1(false)}
+                                >
+  
+                                </IonDatetime>
+                            </IonModal>
 
-                            {datapicker1 && <IonDatetime presentation="date" name="fum" onIonChange={(e) => fecha_FUM(e)} value={moment(ante?.fum).format("YYYY-MM-DD")}></IonDatetime>}
+                            {/*datapicker1 && <IonDatetime presentation="date" name="fum" onIonChange={(e) => fecha_FUM(e)} value={moment(ante?.fum).format("YYYY-MM-DD")}></IonDatetime>*/}
 
                         </IonItem>
                         <IonButton expand="block" fill="outline" onClick={(e) => calculoFPP(e)}>Calcular Fecha Probable de Parto</IonButton>
+                        {/* <IonButton expand="block" fill="outline" onClick={(e) => calculoFUM(e)}>Calcular Fecha Ultimo Embarazo</IonButton>*/}
                     </IonCol>
                     <IonCol>
                         <IonItem>
                             <IonLabel position="stacked">Fecha Probable de Parto</IonLabel>
-                            <IonInput onClick={() => setDataPicker2(true)} name="fpp">{ante?.fpp}</IonInput>
+                            {/* <IonInput onClick={() => setDataPicker2(true)} name="fpp">{ante?.fpp}</IonInput>*/}
+                            {ante?.fpp === null || ante?.fpp === "null" ? <IonButton onClick={(e) => setDataPicker2(true)} size="small" slot="end">FPP</IonButton> : <IonDatetimeButton datetime="datetimeeditarfpp" slot="end"></IonDatetimeButton>}
+                            <IonModal keepContentsMounted={true} isOpen={datapicker2} className="ion-datetime-button-overlay" onDidDismiss={(e) => setDataPicker2(false)}>
+                                <IonDatetime
+                                    id="datetimeeditarfpp"
+                                    name="fpp"
+                                    onIonChange={(e) => fecha_FPP(e)}
+                                    presentation="date"
+                                    showDefaultButtons={true}
+                                    doneText="Confirmar"
+                                    showClearButton
+                                    cancelText="Cancelar"
+                                    clearText="Limpiar"
+                                    value={ante?.fpp}
+                                    onIonCancel={(e) => setDataPicker2(false)}
 
-                            {datapicker2 && <IonDatetime presentation="date" name="fpp" onIonChange={(e) => fecha_FPP(e)} value={moment(ante?.fpp).format("YYYY-MM-DD")}></IonDatetime>}
+
+                                />
+                            </IonModal>
+                            {/*datapicker2 && <IonDatetime presentation="date" name="fpp" onIonChange={(e) => fecha_FPP(e)} value={moment(ante?.fpp).format("YYYY-MM-DD")}></IonDatetime>*/}
                         </IonItem>
 
                     </IonCol>

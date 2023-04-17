@@ -40,8 +40,9 @@ const inicial_control = {
     resp_ESTREPTOCOCO_BETA_HEMOLÍTICO: "N",
     resp_hb: "S",
     resp_glucemia: "S",
-    motivo:9,
-    derivada:0
+    motivo: 9,
+    derivada: 0,
+    gestas: 0
 
 }
 
@@ -59,11 +60,14 @@ const NuevaEmbarazadaControl: React.FC = () => {
     const [motivos, setMotivos] = useState<any>([])
 
     const hoy = moment()
-    const fum = moment(paciente.control.fum)
+    // const fum = moment(paciente.control?.fum)
+    // console.log("fum" +paciente.control?.fum)
     let sqlite = useSQLite()
     let history = useHistory()
     useEffect(() => {
-        setControl((prevProps: any) => ({ ...prevProps, gestas: hoy.diff(fum, "weeks") }));
+        if (paciente.control?.fum !== null) {
+            setControl((prevProps: any) => ({ ...prevProps, gestas: hoy.diff(paciente.control?.fum, "weeks") }));
+        }
 
     }, [])
 
@@ -171,14 +175,14 @@ const NuevaEmbarazadaControl: React.FC = () => {
         control_embarazo.clinico = control.clinico;
         control_embarazo.observaciones = control.observaciones;
         control_embarazo.motivo = control.motivo
-        control_embarazo.derivada=control.derivada
+        control_embarazo.derivada = control.derivada
 
 
         /*Laboratorio y cerologia */
         const laboratorios: any = {};
         //laboratorios.sifilis
         //Insert tabla personas
-        
+
         let ultimo_id_persona = await consulta(`SELECT id_persona FROM personas WHERE id_persona BETWEEN  ${minimo} AND ${maximo} ORDER BY id_persona DESC LIMIT 1`)
         await consulta(`INSERT INTO personas(id_persona,apellido,nombre,documento,fecha_nacimiento,id_origen,nacionalidad,sexo,madre,alta,nacido_vivo) 
        VALUES  (${Number(ultimo_id_persona[0].id_persona) + 1},"${paciente.paciente.apellido}","${paciente.paciente.nombre}",
@@ -219,15 +223,20 @@ const NuevaEmbarazadaControl: React.FC = () => {
         //insert antecedentes
         ultimo_id_control = await consulta(`SELECT id_control FROM controles WHERE id_control BETWEEN ${minimo} AND ${maximo} ORDER BY id_control DESC LIMIT 1`)
         let ultimo_id_antecedentes = await consulta(`SELECT id_antecedente FROM antecedentes WHERE id_antecedente BETWEEN ${minimo} AND ${maximo} ORDER BY id_antecedente DESC LIMIT 1`)
-
+        let insertfum=paciente.control?.fum === null ? null :"\""+ moment(paciente.control.fum).format("YYYY-MM-DD")+"\""
+        console.log("insert "+insertfum)
+        let insert_fecha_ultimo_embarazo = paciente?.control.fecha_ultimo_embarazo === null || paciente?.control.fecha_ultimo_embarazo === "null" ? null : "\"" + paciente?.control.fecha_ultimo_embarazo + "\""
+        let insertfpp=paciente.control?.fpp === null ? null : "\""+moment(paciente.control.fpp).format("YYYY-MM-DD")+"\""
+        
         let antecedentes = await consulta(`INSERT INTO antecedentes(id_antecedente,id_persona,id_control,edad_primer_embarazo,
             fecha_ultimo_embarazo,gestas,partos,cesareas, abortos, planificado, fum, fpp) 
             VALUES (${Number(ultimo_id_antecedentes[0]?.id_antecedente) + 1},${Number(ultimo_id_persona[0].id_persona)},${Number(ultimo_id_control[0].id_control)},
-            ${paciente.control.edad_primer_embarazo},${paciente.control.fecha_ultimo_embarazo},${paciente.control.gestas},
+            ${paciente.control.edad_primer_embarazo},${insert_fecha_ultimo_embarazo},${paciente.control.gestas},
             ${paciente.control.partos},${paciente.control.cesareas},${paciente.control.abortos},${paciente.control.planificado},
-            "${moment(paciente.control.fum).format("YYYY-MM-DD")}","${moment(paciente.control.fpp).format("YYYY-MM-DD")}")`)
-
+            ${insertfum},${insertfpp})`)
+        console.log("@@@ antecedentes " + antecedentes)
         //si hay apps insertar en la tabla antecedentes_apps
+        console.log("paciente control app "+paciente.control.app)
         if (paciente.control.app !== undefined) {
             ultimo_id_antecedentes = await consulta(`SELECT id_antecedente FROM antecedentes WHERE id_antecedente BETWEEN ${minimo} AND ${maximo} ORDER BY id_antecedente DESC LIMIT 1`)
             let apps_antecedentes = await consulta(`INSERT INTO antecedentes_apps(id_antecedente, id_app)
@@ -258,7 +267,7 @@ const NuevaEmbarazadaControl: React.FC = () => {
         VALUES (${Number(ultimo_id_control_embarazada[0].id_control_embarazo) + 1},${Number(ultimo_id_control[0].id_control)},${control_embarazo.edad_gestacional},
         "${control_embarazo.eco}","${control_embarazo.detalle_eco}","${control_embarazo.hpv}","${control_embarazo.pap}",
         ${control_embarazo.sistolica},${control_embarazo.diastolica},"${control_embarazo.clinico}","${control_embarazo.observaciones}","${control_embarazo.motivo}",${control_embarazo.derivada})`)
-        
+
         console.log("@@@@@ Insert control_embarazada ", JSON.stringify(resp_control_embrarazo))
 
         //Insert inmunizaciones
@@ -376,13 +385,13 @@ const NuevaEmbarazadaControl: React.FC = () => {
 
 
         setTimeout(() => {
-            setLoading(false)
-             history.push("/personas")
+           setLoading(false)
+          history.push("/personas")
         }, 1000)
     }
 
 
-    console.log("@@@@@@control " + JSON.stringify(control))
+    //console.log("@@@@@@control " + JSON.stringify(control))
     const consulta = async (query: string): Promise<any> => {
         try {
             let respConection = await sqlite.isConnection("triplefrontera")
@@ -410,7 +419,7 @@ const NuevaEmbarazadaControl: React.FC = () => {
             <IonHeader className="ion-no-border">
                 <IonToolbar>
                     <IonButtons slot="start" >
-                        <IonBackButton defaultHref="/personas" routerAnimation={animationBuilder} />
+                        <IonBackButton defaultHref="/personas" disabled={isLoading} routerAnimation={animationBuilder} />
                     </IonButtons>
                     <IonLabel >Controles de {paciente?.paciente.nombre} {paciente?.paciente.apellido}</IonLabel>
                 </IonToolbar>
@@ -418,7 +427,7 @@ const NuevaEmbarazadaControl: React.FC = () => {
             <IonContent>
                 <form onSubmit={OnSubmit}>
                     <IonItem>
-                        <IonLabel position="floating">Edad Gestacional (FUM {moment(paciente.control.fum).format("LL")})</IonLabel>
+                        <IonLabel position="floating">Edad Gestacional (FUM {moment(paciente.control?.fum).format("LL")})</IonLabel>
                         <IonInput type="number" defaultValue={diferencia} value={control?.gestas} name="gestas" onIonChange={e => handleInputChange(e)} ></IonInput>
                     </IonItem>
                     {/* Ecografia */}
@@ -691,7 +700,7 @@ const NuevaEmbarazadaControl: React.FC = () => {
                         <IonList>
 
                             <IonRadioGroup onIonChange={e => handleInputChange(e)} name="clinico" value={control.clinico}>
-                               
+
                                 <IonItem>
                                     <IonLabel>Normal</IonLabel>
                                     <IonRadio slot="end" value="N"></IonRadio>
@@ -701,11 +710,11 @@ const NuevaEmbarazadaControl: React.FC = () => {
                                     <IonRadio slot="end" value="P"></IonRadio>
                                 </IonItem>
                             </IonRadioGroup>
-                            </IonList>
-                            <IonList>
-                                <IonListHeader>
-                                    <IonLabel>Derivada</IonLabel>
-                                </IonListHeader>
+                        </IonList>
+                        <IonList>
+                            <IonListHeader>
+                                <IonLabel>Derivada</IonLabel>
+                            </IonListHeader>
                             <IonRadioGroup onIonChange={e => handleInputChangeEcografia(e)} name="derivada" value={control.derivada}>
                                 <IonItem>
                                     <IonLabel>Si</IonLabel>
@@ -716,13 +725,13 @@ const NuevaEmbarazadaControl: React.FC = () => {
                                     <IonLabel>No</IonLabel>
                                     <IonRadio slot="end" value={0}></IonRadio>
                                 </IonItem>
-                             </IonRadioGroup>
+                            </IonRadioGroup>
 
                             <IonRadioGroup>
                                 <IonItem>
                                     <IonLabel>Motivos de Derivacíon</IonLabel>
                                     <IonSelect name="motivo" onIonChange={e => handleInputChange(e)}>
-                                        
+
                                         {motivos.map((data: any, i: any) => {
                                             return (
                                                 <IonSelectOption value={data.id_motivo} key={i}>{data.nombre}</IonSelectOption>

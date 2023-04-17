@@ -226,7 +226,12 @@ const EditControlEmbrazada: React.FC = () => {
             setControl((prevProps: any) => ({ ...prevProps, pap: "S" }));
 
         }
-        setControl((prevProps: any) => ({ ...prevProps, edad_gestacional: hoy.diff(dato.data.paciente?.antecedentes.fum, "weeks") }));
+        if(dato.data.paciente?.antecedentes.fum!==null){
+            setControl((prevProps: any) => ({ ...prevProps, edad_gestacional: hoy.diff(dato.data.paciente?.antecedentes.fum, "weeks") }));
+        }else{
+            setControl((prevProps: any) => ({ ...prevProps, edad_gestacional: 0 }));
+        }
+        
     }, [])
 
 
@@ -292,7 +297,7 @@ const EditControlEmbrazada: React.FC = () => {
             control_embarazo.eco = control.ecografia === "N" ? "N" : control.ecografia_resultado;
         }
 
-        control_embarazo.detalle_eco = control.eco_observaciones;
+        control_embarazo.detalle_eco = control.eco_observaciones===undefined?"":control.eco_observaciones;
         control_embarazo.hpv = control.hpv === "N" ? "N" : control.hpv_resultado;
         control_embarazo.pap = control.pap === "N" ? "N" : control.pap_resultado;
         control_embarazo.sistolica = control.sistolica;
@@ -574,7 +579,7 @@ const EditControlEmbrazada: React.FC = () => {
                 <IonHeader className="ion-no-border">
                     <IonToolbar>
                         <IonButtons slot="start" >
-                            <IonBackButton defaultHref="/personas" routerAnimation={animationBuilder} />
+                            <IonBackButton defaultHref="/personas" disabled={isLoading} routerAnimation={animationBuilder} />
                         </IonButtons>
                         <IonLabel >Control {control?.id_control_embarazo} de {paciente?.paciente.nombre} {paciente?.paciente.apellido} / Fecha: {moment(paciente?.data.fecha).format("LL")}</IonLabel>
                     </IonToolbar>
