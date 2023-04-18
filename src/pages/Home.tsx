@@ -7,7 +7,7 @@ import Personas from './Personas';
 import React from 'react';
 import { datos } from '../data/exportar';
 //import './Home.css';
-
+import { Device } from '@capacitor/device';
 
 const Home: React.FC<any> = () => {
 
@@ -21,9 +21,9 @@ const Home: React.FC<any> = () => {
 
       let db: SQLiteDBConnection = await sqlite.createConnection("triplefrontera")
       await db.open();
-      let res: any = await db.exportToJson("full")
+      let res: any = await db.exportToJson("partial")
 
-      console.log(`@@@ res.values.length ${JSON.stringify(res)}`)
+      console.log(`@@@ export ${JSON.stringify(res)}`)
 
 
       // setPaises(JSON.parse(res.values) )
@@ -39,16 +39,28 @@ const Home: React.FC<any> = () => {
   useEffect(() => {
     const testDatabaseCopyFromAssets = async (): Promise<any> => {
       try {
+      
         let existe: any = await sqlite.isDatabase("triplefrontera")
         console.log(`Existe ${JSON.stringify(existe)}`)
         const Jasondato=JSON.parse(JSON.stringify(datos))
         console.log(Jasondato)
         if (!existe.result) {
-          
+         // await sqlite.copyFromAssets()
           await sqlite.importFromJson(JSON.stringify(datos))
-          .then(res=>console.log("Cambios"+res.changes))
-          .catch((error)=>console.log(error))
-          console.log("paso por aca ")
+          .then(async(res)=>{
+            console.log("Cambios"+res.changes)
+            let db: SQLiteDBConnection = await sqlite.createConnection("triplefrontera")
+            await db.open();
+            let rescrate: any = await db.createSyncTable();
+            console.log(`Create Table ${JSON.stringify(rescrate.changes)}`)
+            const d = new Date();    
+            await db.setSyncDate(d.toISOString());
+            
+          
+           await db.close()
+          })
+         .catch((error)=>console.log(error))
+          
         }
 
         let db: SQLiteDBConnection = await sqlite.createConnection("triplefrontera")
@@ -79,7 +91,7 @@ const Home: React.FC<any> = () => {
     }
     testDatabaseCopyFromAssets()
   }, [])
-  
+ 
   return (
 
     <IonPage>

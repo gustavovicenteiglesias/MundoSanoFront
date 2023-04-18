@@ -6,6 +6,7 @@
     "@capacitor-community/sqlite": "^4.5.0",
     "@capacitor/android": "^4.6.1",
     "@capacitor/core": "^4.6.1",
+    "@capacitor/device": "^4.1.0",
     "@capacitor/geolocation": "^4.1.0",
     "@hookform/error-message": "^2.0.0",
     "@ionic/react": "^6.4.0",
