@@ -65,6 +65,7 @@ const Home: React.FC<any> = () => {
 
         let db: SQLiteDBConnection = await sqlite.createConnection("triplefrontera")
         await db.open();
+       
         let res: any = await db.query("SELECT * FROM paises");
         let personas: any = await db.query("SELECT p.nombre,p.apellido FROM ubicaciones u INNER JOIN personas p ON p.id_persona=u.id_persona WHERE u.id_pais=12 AND u.id_area=3 AND u.id_paraje=17 ")
         console.log(`@@@ res.values.length ${res.values.length}`)
