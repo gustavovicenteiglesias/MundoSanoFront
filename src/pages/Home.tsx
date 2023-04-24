@@ -107,10 +107,9 @@ const Home: React.FC<any> = () => {
                 <LocalizacionTrabajo paises={paises} />
 
               </div>
+              {/*<IonButton onClick={()=>exportJson()}>Exportar</IonButton>*/}
             </IonCol>
-            <IonCol>
-              <IonButton onClick={()=>exportJson()}>Exportar</IonButton>
-            </IonCol>
+         
           </IonRow>
 
 
