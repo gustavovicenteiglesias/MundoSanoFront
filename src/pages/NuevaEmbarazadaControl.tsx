@@ -186,7 +186,7 @@ const NuevaEmbarazadaControl: React.FC = () => {
         let ultimo_id_persona = await consulta(`SELECT id_persona FROM personas WHERE id_persona BETWEEN  ${minimo} AND ${maximo} ORDER BY id_persona DESC LIMIT 1`)
         await consulta(`INSERT INTO personas(id_persona,apellido,nombre,documento,fecha_nacimiento,id_origen,nacionalidad,sexo,madre,alta,nacido_vivo) 
        VALUES  (${Number(ultimo_id_persona[0].id_persona) + 1},"${paciente.paciente.apellido}","${paciente.paciente.nombre}",
-       "${paciente.paciente.documento}","${paciente.paciente.fecha_nacimiento}",2,12,"F",${paciente.paciente.madre},${paciente.paciente.alta},${paciente.paciente.nacido_vivo})`
+       "${paciente.paciente.documento}","${moment(paciente.paciente.fecha_nacimiento).format("YYYY-MM-DD")}",2,12,"F",${paciente.paciente.madre},${paciente.paciente.alta},${paciente.paciente.nacido_vivo})`
         )
         //INsert tabla ubicacion
 

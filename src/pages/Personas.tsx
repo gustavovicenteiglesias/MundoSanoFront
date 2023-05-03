@@ -198,8 +198,8 @@ const Personas: React.FC = () => {
       <IonHeader className="ion-no-border">
         <IonToolbar>
           <IonTitle slot="end">Paciente</IonTitle>
-          <IonButtons slot="start" >
-            <IonBackButton defaultHref="/" routerAnimation={animationBuilder} />
+          <IonButtons slot="start" onClick={()=>history.push("/")}>
+            <IonBackButton defaultHref="/"  routerAnimation={animationBuilder} />
 
           </IonButtons>
         </IonToolbar>

@@ -558,7 +558,7 @@ const EditControlEmbrazada: React.FC = () => {
             }
             let db: SQLiteDBConnection = await sqlite.createConnection("triplefrontera")
             await db.open();
-            let res: any = await db.query(query)
+            let res: any = await db.query( query )
             setTimeout(() => {
                 
             }, 1000)

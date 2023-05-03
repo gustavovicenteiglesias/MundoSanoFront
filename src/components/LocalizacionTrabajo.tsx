@@ -19,7 +19,7 @@ const LocalizacionTrabajo: React.FC<any> = ({paises}) => {
    
     return (
         <>
-        <IonItemGroup>
+       {/* <IonItemGroup>
             <IonItem>
                 <IonLabel>PAÍS</IonLabel>
                 <IonSelect value={pais} placeholder="opcion" onIonChange={e => setPais(e.detail.value)}>
@@ -34,7 +34,7 @@ const LocalizacionTrabajo: React.FC<any> = ({paises}) => {
                 </IonSelect>
             </IonItem>
             
-        </IonItemGroup>
+                </IonItemGroup>*/}
         <IonButton expand='block' routerLink="/personas" color="secondary">Continuar</IonButton>
         </>
     )

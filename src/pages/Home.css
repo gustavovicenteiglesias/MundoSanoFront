@@ -46,4 +46,13 @@ ion-card {
     overflow: var(--overflow);
     z-index: 10;
 }
+.col_logos{
+    display: flex;
+    justify-content:center ;
+    align-items: center;
+    
+}
+
+
+
 
