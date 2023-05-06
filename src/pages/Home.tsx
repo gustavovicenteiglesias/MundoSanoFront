@@ -82,6 +82,7 @@ const Home: React.FC<any> = () => {
         /*
         * SI no exite importo por ahora una local 
         */
+       setLoading(true)
         await sqlite.importFromJson(JSON.stringify(datos))
           .then(async (res) => {
             axios.get("https://areco.gob.ar:9535/api/data/json3")
@@ -107,7 +108,7 @@ const Home: React.FC<any> = () => {
                   id: 0,
                   syncDate: de
                 }
-
+                setLoading(false)
                 console.log(`fecha ${de}`)
                 axios.post("https://areco.gob.ar:9535/api/sync_date", datos)
               })
@@ -184,6 +185,7 @@ const Home: React.FC<any> = () => {
   }
 
   const importJson = () => {
+    setLoading(true)
     axios.get("https://areco.gob.ar:9535/api/data/json2")
       .then(async (res) => {
         console.log(`La respuesta es ${JSON.stringify(res.data)}`)
@@ -203,7 +205,7 @@ const Home: React.FC<any> = () => {
           id: 0,
           syncDate: de
         }
-
+        setLoading(false)
         console.log(`fecha ${de}`)
         axios.post("https://areco.gob.ar:9535/api/sync_date", datos)
       })
@@ -242,14 +244,15 @@ const Home: React.FC<any> = () => {
                 <LocalizacionTrabajo paises={paises} />
 
                </div>
-              <IonButton onClick={() => exportJson()} expand='block' color="secondary">Exportar</IonButton>
-              <IonButton onClick={() => importJson()} expand='block' color="secondary">Importar</IonButton>
-              <IonButton onClick={() => nuevaBBDD()} expand='block' color="secondary">Cargar nueva base de datos </IonButton>
+              <IonButton onClick={() => exportJson()} expand='block' color="secondary" className='button_css'>Exportar</IonButton>
+              <IonButton onClick={() => importJson()} expand='block' color="secondary" className='button_css'>Importar</IonButton>
+              <IonButton onClick={() => nuevaBBDD()} expand='block' color="secondary" className='button_css'>Cargar nueva base de datos </IonButton>
               {hiddenFecha && <IonItem onClick={() => exportJsontoApi()}>
                 <IonLabel className="ion-text-wrap">Tu ultima actualizacíon es del dia {moment(fechaActualizacion).format("YYYY-MM-DD")}</IonLabel>
-                <IonLoading message="Por favor esperar a que termine..." isOpen={loading} />
+                
                 {!loading && <IonIcon icon={downloadOutline} color={colorLogo ? "success" : "danger"}></IonIcon>}
               </IonItem>}
+              <IonLoading message="Por favor esperar a que termine..." isOpen={loading} />
             </IonCol>
 
           </IonRow>

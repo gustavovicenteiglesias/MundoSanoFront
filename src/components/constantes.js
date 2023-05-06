@@ -1,3 +1,3 @@
-const maximo=399999
-const minimo=300000
+const maximo=199999
+const minimo=100000
 export{maximo,minimo}
